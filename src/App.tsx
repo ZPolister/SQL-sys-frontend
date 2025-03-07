@@ -17,6 +17,7 @@ import Body from "./pages/body";
 import Sport from "./pages/sport";
 import Sleep from "./pages/sleep";
 import Nutrition from "./pages/nutrition";
+import {$app} from "./app/app";
 
 const {HeadMenu, MenuItem} = Menu;
 const {Header, Content, Footer, Aside} = Layout;
@@ -100,6 +101,15 @@ const App: React.FC = () => {
   }, [selectedKey])
 
 
+  const handleNotification = () => {
+    console.log('生成通知')
+    $app.requestNotificationPermission()
+    const n = $app.sendNotification("TTXX", "TTTTTTTTTXX")
+    n?.addEventListener("click", () => {
+      console.log("通知被点击")
+    })
+  }
+
   return (
     <ConfigProvider globalConfig={{classPrefix: 't'}}>
       <div className="tdesign-demo-item--layout h-[100dvh]">
@@ -116,7 +126,10 @@ const App: React.FC = () => {
               operations={
                 <div className="t-menu__operations">
                   <SearchIcon className="t-menu__operations-icon"/>
-                  <NotificationFilledIcon className="t-menu__operations-icon"/>
+                  <NotificationFilledIcon
+                    className="t-menu__operations-icon"
+                    onClick={handleNotification}
+                  />
                   <HomeIcon className="t-menu__operations-icon"/>
                   <Link theme={"primary"} prefixIcon={<LogoutIcon/>}>
                     退出账号
