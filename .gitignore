@@ -14,3 +14,6 @@ psd
 thumb
 sketch
 
+.env.local
+/scripts/OpenAPI.json
+/scripts/OpenAPI_postprocess.json
