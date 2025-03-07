@@ -22,9 +22,11 @@ import type {
     HealthGoalDto,
     LoginDto,
     Page,
+    PostApiAuthLogin200Response,
     RegisterDto,
     ResponseResult,
     SleepLogDto,
+    UserInfoDto,
 } from '../models/index';
 import {
     BiometricRecordDtoToJSON,
@@ -34,9 +36,11 @@ import {
     HealthGoalDtoToJSON,
     LoginDtoToJSON,
     PageFromJSON,
+    PostApiAuthLogin200ResponseFromJSON,
     RegisterDtoToJSON,
     ResponseResultFromJSON,
     SleepLogDtoToJSON,
+    UserInfoDtoToJSON,
 } from '../models/index';
 
 export interface DeleteApiHealthBiometricIdRequest {
@@ -121,6 +125,10 @@ export interface PostHealthGoalsRequest {
 
 export interface PostSleepRequest {
     sleepLogDto?: SleepLogDto;
+}
+
+export interface PutAccountRequest {
+    userInfoDto?: UserInfoDto;
 }
 
 /**
@@ -300,6 +308,34 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async deleteSleepLogId(requestParameters: DeleteSleepLogIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResult> {
         const response = await this.deleteSleepLogIdRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     *
+     * 获取用户信息
+     */
+    async getAccountRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseResult>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/account`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseResultFromJSON(jsonValue));
+    }
+
+    /**
+     *
+     * 获取用户信息
+     */
+    async getAccount(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResult> {
+        const response = await this.getAccountRaw(initOverrides);
         return await response.value();
     }
 
@@ -611,7 +647,7 @@ export class DefaultApi extends runtime.BaseAPI {
      *
      * 导出健康数据
      */
-    async getExportBiometricRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getExportBiometricRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -623,22 +659,23 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse<any>(response);
     }
 
     /**
      *
      * 导出健康数据
      */
-    async getExportBiometric(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getExportBiometricRaw(initOverrides);
+    async getExportBiometric(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.getExportBiometricRaw(initOverrides);
+        return await response.value();
     }
 
     /**
      *
      * 导出饮食数据
      */
-    async getExportDietRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getExportDietRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -650,22 +687,23 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse<any>(response);
     }
 
     /**
      *
      * 导出饮食数据
      */
-    async getExportDiet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getExportDietRaw(initOverrides);
+    async getExportDiet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.getExportDietRaw(initOverrides);
+        return await response.value();
     }
 
     /**
      *
      * 导出运动数据
      */
-    async getExportExerciseRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getExportExerciseRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -677,22 +715,23 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse<any>(response);
     }
 
     /**
      *
      * 导出运动数据
      */
-    async getExportExercise(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getExportExerciseRaw(initOverrides);
+    async getExportExercise(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.getExportExerciseRaw(initOverrides);
+        return await response.value();
     }
 
     /**
      *
      * 导出睡眠数据
      */
-    async getExportSleepRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getExportSleepRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -704,15 +743,16 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse<any>(response);
     }
 
     /**
      *
      * 导出睡眠数据
      */
-    async getExportSleep(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getExportSleepRaw(initOverrides);
+    async getExportSleep(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.getExportSleepRaw(initOverrides);
+        return await response.value();
     }
 
     /**
@@ -819,7 +859,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * 使用用户名/邮箱登录获取Token
      * 用户登录
      */
-    async postApiAuthLoginRaw(requestParameters: PostApiAuthLoginRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseResult>> {
+    async postApiAuthLoginRaw(requestParameters: PostApiAuthLoginRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostApiAuthLogin200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -834,14 +874,14 @@ export class DefaultApi extends runtime.BaseAPI {
             body: LoginDtoToJSON(requestParameters['loginDto']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseResultFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PostApiAuthLogin200ResponseFromJSON(jsonValue));
     }
 
     /**
      * 使用用户名/邮箱登录获取Token
      * 用户登录
      */
-    async postApiAuthLogin(requestParameters: PostApiAuthLoginRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResult> {
+    async postApiAuthLogin(requestParameters: PostApiAuthLoginRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostApiAuthLogin200Response> {
         const response = await this.postApiAuthLoginRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -1096,6 +1136,37 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async postSleep(requestParameters: PostSleepRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResult> {
         const response = await this.postSleepRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     *
+     * 更新用户信息
+     */
+    async putAccountRaw(requestParameters: PutAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseResult>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/account`,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UserInfoDtoToJSON(requestParameters['userInfoDto']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseResultFromJSON(jsonValue));
+    }
+
+    /**
+     *
+     * 更新用户信息
+     */
+    async putAccount(requestParameters: PutAccountRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResult> {
+        const response = await this.putAccountRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

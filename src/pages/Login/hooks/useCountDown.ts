@@ -3,7 +3,7 @@ import {useEffect, useRef, useState} from 'react';
 const useCountdown = (duration: number) => {
   const [countdown, setCountdown] = useState(0);
   const [isSetup, toggleSetup] = useState(false);
-  const timer = useRef<NodeJS.Timeout>();
+  const timer = useRef<any>();
 
   useEffect(() => {
     if (isSetup) {
@@ -11,7 +11,7 @@ const useCountdown = (duration: number) => {
       timer.current = setInterval(() => {
         setCountdown((current) => current - 1);
       }, 1000);
-    } else clearInterval(timer.current as NodeJS.Timeout);
+    } else clearInterval(timer.current as any);
   }, [isSetup]);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ const useCountdown = (duration: number) => {
     }
   }, [countdown]);
 
-  useEffect(() => () => clearInterval(timer.current as NodeJS.Timeout), []);
+  useEffect(() => () => clearInterval(timer.current as any), []);
 
   function setupCountdown() {
     toggleSetup(true);

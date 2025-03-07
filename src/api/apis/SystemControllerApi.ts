@@ -22,32 +22,32 @@ import {ResponseResultFromJSON,} from '../models/index';
  */
 export class SystemControllerApi extends runtime.BaseAPI {
 
-  /**
-   *
-   * test
-   */
-  async getSystemRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseResult>> {
-    const queryParameters: any = {};
+    /**
+     *
+     * test
+     */
+    async getSystemRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseResult>> {
+        const queryParameters: any = {};
 
-    const headerParameters: runtime.HTTPHeaders = {};
+        const headerParameters: runtime.HTTPHeaders = {};
 
-    const response = await this.request({
-      path: `/system`,
-      method: 'GET',
-      headers: headerParameters,
-      query: queryParameters,
-    }, initOverrides);
+        const response = await this.request({
+            path: `/system`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
 
-    return new runtime.JSONApiResponse(response, (jsonValue) => ResponseResultFromJSON(jsonValue));
-  }
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseResultFromJSON(jsonValue));
+    }
 
-  /**
-   *
-   * test
-   */
-  async getSystem(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResult> {
-    const response = await this.getSystemRaw(initOverrides);
-    return await response.value();
-  }
+    /**
+     *
+     * test
+     */
+    async getSystem(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResult> {
+        const response = await this.getSystemRaw(initOverrides);
+        return await response.value();
+    }
 
 }

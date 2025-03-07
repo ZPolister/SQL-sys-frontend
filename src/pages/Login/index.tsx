@@ -43,7 +43,7 @@ export default memo(() => {
             </Link>
           </div>
         </div>
-        {type === 'login' ? <Login/> : <Register/>}
+        {type === 'login' ? <Login/> : <Register handleSwitchLoginType={handleSwitchLoginType}/>}
       </div>
       <footer className={Style.copyright}>Copyright @ 2025 TTXX. All Rights Reserved</footer>
     </div>

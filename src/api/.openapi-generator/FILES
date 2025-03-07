@@ -1,4 +1,3 @@
-apis/AnalysisControllerApi.ts
 apis/DefaultApi.ts
 apis/SystemControllerApi.ts
 apis/index.ts
@@ -12,8 +11,11 @@ models/LoginDto.ts
 models/OrderItem.ts
 models/Page.ts
 models/PageObject.ts
+models/PostApiAuthLogin200Response.ts
+models/PostApiAuthLogin200ResponseData.ts
 models/RegisterDto.ts
 models/ResponseResult.ts
 models/SleepLogDto.ts
+models/UserInfoDto.ts
 models/index.ts
 runtime.ts

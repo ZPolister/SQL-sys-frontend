@@ -1,6 +1,7 @@
-import {AnalysisControllerApi, Configuration, DefaultApi, SystemControllerApi} from "../api";
+import {Configuration, DefaultApi, SystemControllerApi} from "../api";
 import {useLoginStore} from "../stores/useLoginStore";
 import {MessagePlugin} from "tdesign-react";
+import {AnalysisControllerApi} from "../api/apis/AnalysisControllerApi";
 
 export class HealthApp extends EventTarget {
   $DefaultApi: DefaultApi;
@@ -13,7 +14,8 @@ export class HealthApp extends EventTarget {
     super();
 
     this.apiConfig = new Configuration({
-      basePath: __API_URL__,
+      // basePath: __API_URL__,
+      basePath: "/api",
       middleware: [
         {
           pre: context => {
@@ -133,6 +135,62 @@ export class HealthApp extends EventTarget {
       .catch((err) => {
         MessagePlugin.error(err.message).finally()
         useLoginStore.getState().setState('logout')
+      })
+  }
+
+  logout() {
+    useLoginStore.getState().setState('pending')
+
+    $app.$DefaultApi.postApiAuthLogout()
+      .then((res) => {
+        if (res.code === 200) {
+          MessagePlugin.success("退出成功").finally()
+          useLoginStore.getState().setState('logout')
+        } else {
+          throw new Error("退出失败，未知错误")
+        }
+      })
+      .catch((err) => {
+        MessagePlugin.error(err.message).finally()
+      })
+  }
+
+  async register(account: string, password: string, email: string, emailCode: string) {
+    useLoginStore.getState().setState('pending')
+
+    try {
+      const res = await $app.$DefaultApi.postApiAuthRegister({
+        registerDto: {
+          username: account,
+          password: password,
+          email: email,
+          code: emailCode
+        }
+      });
+      if (res.code === 200) {
+        MessagePlugin.success("注册成功，请继续登录").finally();
+        useLoginStore.getState().setState('logout');
+      } else {
+        throw new Error("注册失败，未知错误");
+      }
+    } catch (err) {
+      MessagePlugin.error(`${err}`).finally();
+    }
+  }
+
+  sendEmailCode(email: string) {
+    $app.$DefaultApi.postApiAuthSendCode({
+      email: email
+    })
+      .then((res) => {
+        if (res.code === 200) {
+          MessagePlugin.success("发送成功").finally()
+        } else {
+          throw new Error("发送失败，未知错误")
+        }
+      })
+      .catch((err) => {
+        MessagePlugin.error(err.message).finally()
       })
   }
 }

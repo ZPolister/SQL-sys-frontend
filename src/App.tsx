@@ -1,14 +1,12 @@
 import * as React from "react"
 import {useCallback, useState} from "react"
-import {ConfigProvider, Layout, Link, Loading, Menu} from 'tdesign-react';
+import {ConfigProvider, DialogPlugin, Layout, Link, Loading, Menu} from 'tdesign-react';
 import {
   AccessibilityIcon,
   AppleIcon,
   DashboardIcon,
-  HomeIcon,
   LogoutIcon,
-  NotificationFilledIcon,
-  SearchIcon,
+  NotificationIcon,
   SleepIcon,
   ThumbUp1Icon,
 } from "tdesign-icons-react";
@@ -113,6 +111,20 @@ const App: React.FC = () => {
     })
   }
 
+  const handleLogout = () => {
+    const d = DialogPlugin.confirm({
+      header: "退出登录",
+      body: "是否确认退出登录？",
+      onConfirm: () => {
+        $app.logout()
+        d.destroy()
+      },
+      onClose: () => {
+        d.destroy()
+      }
+    })
+  }
+
   return (
     <ConfigProvider globalConfig={{classPrefix: 't'}}>
       <div className="tdesign-demo-item--layout h-[100dvh]">
@@ -129,14 +141,16 @@ const App: React.FC = () => {
                       )}
                       operations={
                         <div className="t-menu__operations">
-                          <SearchIcon className="t-menu__operations-icon"/>
-                          <NotificationFilledIcon
+                          <NotificationIcon
                             className="t-menu__operations-icon"
                             onClick={handleNotification}
                           />
-                          <HomeIcon className="t-menu__operations-icon"/>
-                          <Link theme={"primary"} prefixIcon={<LogoutIcon/>}>
-                            退出账号
+                          <Link
+                            theme={"primary"}
+                            prefixIcon={<LogoutIcon/>}
+                            onClick={handleLogout}
+                          >
+                            退出
                           </Link>
                         </div>
                       }

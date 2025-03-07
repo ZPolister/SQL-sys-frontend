@@ -51,7 +51,7 @@ export function LoginDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     }
     return {
 
-        'identifier': json['identifier'],
+      'identifier': json['identifier'],
         'password': json['password'],
     };
 }
@@ -67,7 +67,7 @@ export function LoginDtoToJSONTyped(value?: LoginDto | null, ignoreDiscriminator
 
     return {
 
-        'identifier': value['identifier'],
+      'identifier': value['identifier'],
         'password': value['password'],
     };
 }
