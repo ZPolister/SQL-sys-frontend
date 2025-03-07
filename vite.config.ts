@@ -21,5 +21,13 @@ export default defineConfig({
   ],
   define: {
     __API_URL__: JSON.stringify(process.env.API_URL)
-  }
+  },
+  css: {
+    // 预处理器配置项
+    preprocessorOptions: {
+      less: {
+        javascriptEnabled: true,
+      },
+    },
+  },
 })

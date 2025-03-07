@@ -18,57 +18,57 @@
  * @interface LoginDto
  */
 export interface LoginDto {
-  /**
-   * 登录标识（用户名或邮箱）
-   * @type {string}
-   * @memberof LoginDto
-   */
-  identifier: string;
-  /**
-   * 登录密码
-   * @type {string}
-   * @memberof LoginDto
-   */
-  password: string;
+    /**
+     * 登录标识（用户名或邮箱）
+     * @type {string}
+     * @memberof LoginDto
+     */
+    identifier: string;
+    /**
+     * 登录密码
+     * @type {string}
+     * @memberof LoginDto
+     */
+    password: string;
 }
 
 /**
  * Check if a given object implements the LoginDto interface.
  */
 export function instanceOfLoginDto(value: object): value is LoginDto {
-  if (!('identifier' in value) || value['identifier'] === undefined) return false;
-  if (!('password' in value) || value['password'] === undefined) return false;
-  return true;
+    if (!('identifier' in value) || value['identifier'] === undefined) return false;
+    if (!('password' in value) || value['password'] === undefined) return false;
+    return true;
 }
 
 export function LoginDtoFromJSON(json: any): LoginDto {
-  return LoginDtoFromJSONTyped(json, false);
+    return LoginDtoFromJSONTyped(json, false);
 }
 
 export function LoginDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): LoginDto {
-  if (json == null) {
-    return json;
-  }
-  return {
+    if (json == null) {
+        return json;
+    }
+    return {
 
-    'identifier': json['identifier'],
-    'password': json['password'],
-  };
+        'identifier': json['identifier'],
+        'password': json['password'],
+    };
 }
 
 export function LoginDtoToJSON(json: any): LoginDto {
-  return LoginDtoToJSONTyped(json, false);
+    return LoginDtoToJSONTyped(json, false);
 }
 
 export function LoginDtoToJSONTyped(value?: LoginDto | null, ignoreDiscriminator: boolean = false): any {
-  if (value == null) {
-    return value;
-  }
+    if (value == null) {
+        return value;
+    }
 
-  return {
+    return {
 
-    'identifier': value['identifier'],
-    'password': value['password'],
-  };
+        'identifier': value['identifier'],
+        'password': value['password'],
+    };
 }
 

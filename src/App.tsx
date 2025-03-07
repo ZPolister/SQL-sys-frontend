@@ -1,6 +1,6 @@
 import * as React from "react"
-import {useCallback} from "react"
-import {ConfigProvider, Layout, Link, Menu} from 'tdesign-react';
+import {useCallback, useState} from "react"
+import {ConfigProvider, Layout, Link, Loading, Menu} from 'tdesign-react';
 import {
   AccessibilityIcon,
   AppleIcon,
@@ -18,6 +18,8 @@ import Sport from "./pages/sport";
 import Sleep from "./pages/sleep";
 import Nutrition from "./pages/nutrition";
 import {$app} from "./app/app";
+import useLoginVM from "./hooks/useLoginVM";
+import Login from "./pages/Login";
 
 const {HeadMenu, MenuItem} = Menu;
 const {Header, Content, Footer, Aside} = Layout;
@@ -79,8 +81,9 @@ function SideMenu({selected, onSelected}: SideMenuProps) {
 }
 
 const App: React.FC = () => {
+  const {state: loginState} = useLoginVM()
+  const [selectedKey, setSelectedKey] = useState('overview');
 
-  const [selectedKey, setSelectedKey] = React.useState('overview');
 
   // 创建路由组件映射
   const renderContent = useCallback(() => {
@@ -115,55 +118,67 @@ const App: React.FC = () => {
       <div className="tdesign-demo-item--layout h-[100dvh]">
         <Layout className={"h-full"}>
 
-          <Header>
-            <HeadMenu
-              value="item1"
-              logo={(
-                <div className={"text-lg font-semibold"}>
-                  TTXX健康管理平台
-                </div>
-              )}
-              operations={
-                <div className="t-menu__operations">
-                  <SearchIcon className="t-menu__operations-icon"/>
-                  <NotificationFilledIcon
-                    className="t-menu__operations-icon"
-                    onClick={handleNotification}
-                  />
-                  <HomeIcon className="t-menu__operations-icon"/>
-                  <Link theme={"primary"} prefixIcon={<LogoutIcon/>}>
-                    退出账号
-                  </Link>
-                </div>
-              }
-            >
-              <MenuItem value="item2">顶部</MenuItem>
-              <MenuItem value="item3">导航按钮</MenuItem>
-              <MenuItem value="item4" disabled>
-                留给你TTXX
-              </MenuItem>
-            </HeadMenu>
-          </Header>
+          {loginState === "logged" && <>
+              <Header>
+                  <HeadMenu
+                      value="item1"
+                      logo={(
+                        <div className={"text-lg font-semibold"}>
+                          TTXX健康管理平台
+                        </div>
+                      )}
+                      operations={
+                        <div className="t-menu__operations">
+                          <SearchIcon className="t-menu__operations-icon"/>
+                          <NotificationFilledIcon
+                            className="t-menu__operations-icon"
+                            onClick={handleNotification}
+                          />
+                          <HomeIcon className="t-menu__operations-icon"/>
+                          <Link theme={"primary"} prefixIcon={<LogoutIcon/>}>
+                            退出账号
+                          </Link>
+                        </div>
+                      }
+                  >
+                      <MenuItem value="item2">顶部</MenuItem>
+                      <MenuItem value="item3">导航按钮</MenuItem>
+                      <MenuItem value="item4" disabled>
+                          留给你TTXX
+                      </MenuItem>
+                  </HeadMenu>
+              </Header>
 
-          <Layout className={"h-full relative overflow-hidden"}>
+              <Layout className={"h-full relative overflow-hidden"}>
 
-            <Aside style={{borderTop: '1px solid var(--component-border)'}}>
-              <SideMenu
-                selected={selectedKey}
-                onSelected={setSelectedKey}
-              />
-            </Aside>
+                  <Aside style={{borderTop: '1px solid var(--component-border)'}}>
+                      <SideMenu
+                          selected={selectedKey}
+                          onSelected={setSelectedKey}
+                      />
+                  </Aside>
 
-            <Layout className={"overflow-y-scroll overflow-x-hidden"}>
+                  <Layout className={"overflow-y-scroll overflow-x-hidden"}>
 
-              <Content>
-                {renderContent()}
-              </Content>
+                      <Content>
+                        {renderContent()}
+                      </Content>
 
-              <Footer>Copyright @ TTXX 2025. All Rights Reserved</Footer>
+                      <Footer>Copyright @ TTXX 2025. All Rights Reserved</Footer>
 
-            </Layout>
-          </Layout>
+                  </Layout>
+              </Layout>
+          </>}
+
+          {loginState === "pending" && <div
+              className={"flex flex-row items-center justify-center w-full h-dvh"}
+          >
+              <Loading size={"small"} text={"正在验证登录..."}/>
+          </div>}
+
+          {loginState === "logout" && <>
+              <Login/>
+          </>}
 
         </Layout>
       </div>

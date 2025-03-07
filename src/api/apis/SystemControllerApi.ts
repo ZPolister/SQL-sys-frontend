@@ -24,7 +24,7 @@ export class SystemControllerApi extends runtime.BaseAPI {
 
   /**
    *
-   * get_system
+   * test
    */
   async getSystemRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseResult>> {
     const queryParameters: any = {};
@@ -43,7 +43,7 @@ export class SystemControllerApi extends runtime.BaseAPI {
 
   /**
    *
-   * get_system
+   * test
    */
   async getSystem(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResult> {
     const response = await this.getSystemRaw(initOverrides);

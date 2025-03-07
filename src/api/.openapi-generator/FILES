@@ -6,6 +6,7 @@ index.ts
 models/BiometricRecordDto.ts
 models/DietLogDto.ts
 models/ExerciseLogDto.ts
+models/GetApiAuthCheckLogin200Response.ts
 models/HealthGoalDto.ts
 models/LoginDto.ts
 models/OrderItem.ts

@@ -3,6 +3,7 @@
 export * from './BiometricRecordDto';
 export * from './DietLogDto';
 export * from './ExerciseLogDto';
+export * from './GetApiAuthCheckLogin200Response';
 export * from './HealthGoalDto';
 export * from './LoginDto';
 export * from './OrderItem';

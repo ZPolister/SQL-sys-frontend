@@ -13,4 +13,4 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 )
 
 $app.showVersion();
-$app.registerServiceWorker()
+// $app.registerServiceWorker()

@@ -9,7 +9,7 @@ export interface LoginStoreAction {
   setState: (state: LoginStoreState["state"]) => void
 }
 
-const useLoginStore = create<LoginStoreState & LoginStoreAction>(
+export const useLoginStore = create<LoginStoreState & LoginStoreAction>(
   (set) => ({
     state: "pending",
 

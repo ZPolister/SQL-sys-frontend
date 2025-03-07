@@ -26,7 +26,7 @@ export class AnalysisControllerApi extends runtime.BaseAPI {
 
   /**
    *
-   * get_analysis_stream
+   * 获取分析数据
    */
   async getAnalysisStreamRaw(requestParameters: GetAnalysisStreamRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
     const queryParameters: any = {};
@@ -49,7 +49,7 @@ export class AnalysisControllerApi extends runtime.BaseAPI {
 
   /**
    *
-   * get_analysis_stream
+   * 获取分析数据
    */
   async getAnalysisStream(requestParameters: GetAnalysisStreamRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
     const response = await this.getAnalysisStreamRaw(requestParameters, initOverrides);
