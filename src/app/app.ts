@@ -1,11 +1,10 @@
 import {Configuration, DefaultApi, SystemControllerApi} from "../api";
 import {useLoginStore} from "../stores/useLoginStore";
 import {MessagePlugin} from "tdesign-react";
-import {AnalysisControllerApi} from "../api/apis/AnalysisControllerApi";
+
 
 export class HealthApp extends EventTarget {
   $DefaultApi: DefaultApi;
-  $AnalysisControllerApi: AnalysisControllerApi;
   $SystemControllerApi: SystemControllerApi;
 
   apiConfig: Configuration;
@@ -29,7 +28,6 @@ export class HealthApp extends EventTarget {
     })
 
     this.$DefaultApi = new DefaultApi(this.apiConfig);
-    this.$AnalysisControllerApi = new AnalysisControllerApi(this.apiConfig);
     this.$SystemControllerApi = new SystemControllerApi(this.apiConfig);
 
     this.syncLoginState()

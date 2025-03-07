@@ -11,3 +11,9 @@ npm i
 ```shell
 npm run dev
 ```
+
+### 构建API
+
+```shell
+npm run build-api
+```
