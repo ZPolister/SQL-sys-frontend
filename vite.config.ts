@@ -23,7 +23,11 @@ export default defineConfig({
       '/api': {
         target: process.env.API_URL,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        rewrite: (path) => {
+          const rewritePath = path.replace(/^\/api/, '')
+          console.log(`已重定向到 ${rewritePath}`)
+          return rewritePath
+        }
       }
     }
   },
