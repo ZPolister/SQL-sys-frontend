@@ -1,4 +1,4 @@
-import {Configuration, DefaultApi, SystemControllerApi} from "../api";
+import {Configuration, DefaultApi, ResponseContext, SystemControllerApi} from "../api";
 import {useLoginStore} from "../stores/useLoginStore";
 import {MessagePlugin} from "tdesign-react";
 
@@ -23,6 +23,13 @@ export class HealthApp extends EventTarget {
               resolve(context);
             });
           },
+          post(context: ResponseContext): Promise<Response | void> {
+            return new Promise(async (resolve, reject) => {
+              const res = context.response.clone()
+              console.log(`[HealthApp] 响应 ${context.url}`, await res.json())
+              resolve(context.response);
+            })
+          }
         }
       ]
     })
