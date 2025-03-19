@@ -6,7 +6,9 @@ import {
     ExerciseLogDto,
     SleepLogDto,
     HealthCheckReminderDto,
-    ResponseResult, BiometricRecordVo
+    ResponseResult,
+    BiometricRecordVo,
+    HealthGoal
 } from "../api";
 import {$app} from "../app/app";
 
@@ -33,6 +35,22 @@ export default function Overview() {
   const [dietCalories, setDietCalories] = useState<number>(0);
   const [sleepData, setSleepData] = useState<SleepLogDto | null>(null);
   const [healthCheckReminder, setHealthCheckReminder] = useState<HealthCheckReminderDto | null>(null);
+  const [healthGoal, setHealthGoal] = useState<HealthGoal | null>(null);
+
+  // 健康目标类别映射
+  const goalCategoryMap: Record<string, string> = {
+    'WEIGHT_LOSS': '控制体重',
+    'BLOOD_LIPID': '控制血脂',
+    'BLOOD_SUGAR': '控制血糖',
+    'EXERCISE_CALORIES': '热量目标'
+  };
+
+  // 目标状态映射
+  const goalStatusMap: Record<number, { text: string; theme: 'success' | 'warning' | 'default' }> = {
+    0: { text: '进行中', theme: 'default' },
+    1: { text: '已达成', theme: 'success' },
+    2: { text: '未达成', theme: 'warning' }
+  };
 
   useEffect(() => {
       const api = $app.$DefaultApi;
@@ -45,13 +63,15 @@ export default function Overview() {
           exerciseResult,
           dietResult,
           sleepResult,
-          reminderResult
+          reminderResult,
+          goalResult
         ] = await Promise.all([
-          api.getHealthLatestRaw(),
+          api.getHealthLatest(),
           api.getExerciseLatest(),
           api.getDietHotToday(),
           api.getSleepLatest(),
-          api.getHealthCheckReminder()
+          api.getHealthCheckReminder(),
+          api.getHealthGoalsCurrent()
         ]);
 
         // 解构API响应
@@ -60,6 +80,7 @@ export default function Overview() {
         const dietResponse = dietResult as ResponseResult;
         const sleepResponse = sleepResult as ResponseResult;
         const reminderResponse = reminderResult as ResponseResult;
+        const goalResponse = goalResult as ResponseResult
         if (biometricResponse.code === 200 && biometricResponse.data) {
           setBiometricData(biometricResponse.data as BiometricRecordVo);
         }
@@ -79,6 +100,10 @@ export default function Overview() {
         if (reminderResponse.code === 200 && reminderResponse.data) {
           setHealthCheckReminder(reminderResponse.data as HealthCheckReminderDto);
         }
+
+        if (goalResponse.code === 200 && goalResponse.data) {
+          setHealthGoal(goalResponse.data as HealthGoal);
+        }
       } catch (error) {
         console.error('Failed to fetch overview data:', error);
       }
@@ -89,34 +114,6 @@ export default function Overview() {
 
   return (
     <div className={"p-6 flex flex-col gap-5"}>
-      <Card
-        title={"健康体检提醒"}
-        actions={(
-          <Button theme="primary" variant="text" icon={<AddIcon/>}>
-            设置提醒
-          </Button>
-        )}
-      >
-        <div className={"w-full flex flex-row items-center justify-between p-4"}>
-          {healthCheckReminder && (
-            <>
-              <Statistic
-                title="下次体检时间"
-                value={healthCheckReminder.scheduledTime}
-              />
-              <Statistic
-                title="检查周期"
-                value={healthCheckReminder.checkFrequencyDays}
-                unit="天"
-              />
-              <div>
-                <div className="text-sm text-gray-500 mb-1">提醒内容</div>
-                <div>{healthCheckReminder.reminderContent}</div>
-              </div>
-            </>
-          )}
-        </div>
-      </Card>
 
       <Card
         title={"体征数据"}
@@ -127,35 +124,48 @@ export default function Overview() {
         )}
       >
         {biometricData && (
-          <div className={"w-full flex flex-col gap-4 p-4"}>
-            <Row gutter={[16, 16]}>
-              <Col span={6}>
-                <Statistic title="BMI" value={biometricData.bmi?.toFixed(1)} />
-                <Tag theme={biometricData.bmiLevel === "正常" ? "success" : "warning"} className="mt-2">
-                  {biometricData.bmiLevel}
-                </Tag>
-              </Col>
+          <div className={"w-full flex flex-col gap-6 p-4"}>
+            <Row gutter={[16, 16]} className="mb-4">
+        <Col span={6}>
+          <Statistic title="身高" value={biometricData.heightCm} unit="cm" />
+        </Col>
+        <Col span={6}>
+          <Statistic title="体重" value={biometricData.weightKg} unit="kg" />
+        </Col>
+      </Row>
+      <Row gutter={[16, 16]}>
+        <Col span={6}>
+          <Statistic title="BMI" value={biometricData.bmi?.toFixed(1)} />
+          <Tag theme={biometricData.bmiLevel === "正常" ? "success" : "warning"} className="mt-4">
+            {biometricData.bmiLevel}
+          </Tag>
+        </Col>
               <Col span={6}>
                 <Statistic
                   title="血压"
                   value={`${biometricData.systolicPressure}/${biometricData.diastolicPressure}`}
                   unit="mmHg"
                 />
-                <Tag theme={biometricData.bloodPressureLevel === "正常" ? "success" : "warning"} className="mt-2">
+                <Tag theme={biometricData.bloodPressureLevel === "正常" ? "success" : "warning"} className="mt-4">
                   {biometricData.bloodPressureLevel}
                 </Tag>
               </Col>
               <Col span={6}>
                 <Statistic title="血糖" value={biometricData.bloodGlucose} unit="mmol/L" />
-                <Tag theme={biometricData.bloodGlucoseLevel === "正常" ? "success" : "warning"} className="mt-2">
+                <Tag theme={biometricData.bloodGlucoseLevel === "正常" ? "success" : "warning"} className="mt-4">
                   {biometricData.bloodGlucoseLevel}
                 </Tag>
               </Col>
               <Col span={6}>
                 <Statistic title="血脂" value={biometricData.bloodLipid} unit="mmol/L" />
-                <Tag theme={biometricData.bloodLipidLevel === "正常" ? "success" : "warning"} className="mt-2">
+                <Tag theme={biometricData.bloodLipidLevel === "正常" ? "success" : "warning"} className="mt-4">
                   {biometricData.bloodLipidLevel}
                 </Tag>
+              </Col>
+              <Col span={12}>
+                <div className="text-sm text-gray-500">
+                  测量时间：{new Date(biometricData.measurementTime).toLocaleString()}
+                </div>
               </Col>
             </Row>
           </div>
@@ -221,6 +231,75 @@ export default function Overview() {
           </div>
         )}
       </Card>
+
+      {healthGoal && (
+        <Card
+          title={"健康目标"}
+          actions={(
+            <Button theme="primary" variant="text" icon={<AddIcon/>}>
+              设置目标
+            </Button>
+          )}
+        >
+          <div className={"w-full flex flex-row items-center justify-between p-4"}>
+            <div>
+              <div className="text-sm text-gray-500 mb-2">{goalCategoryMap[healthGoal.goalCategory]}</div>
+              <Statistic
+                title="目标值"
+                value={healthGoal.targetValue}
+                unit={healthGoal.goalCategory === 'EXERCISE_CALORIES' ? '千卡' :
+                      healthGoal.goalCategory === 'WEIGHT_LOSS' ? 'kg' : 'mmol/L'}
+              />
+            </div>
+            <div>
+              <div className="text-sm text-gray-500 mb-2">当前进度</div>
+              <Statistic
+                title="当前值"
+                value={healthGoal.currentValue}
+                unit={healthGoal.goalCategory === 'EXERCISE_CALORIES' ? '千卡' :
+                      healthGoal.goalCategory === 'WEIGHT_LOSS' ? 'kg' : 'mmol/L'}
+              />
+            </div>
+            <div>
+              <div className="text-sm text-gray-500 mb-2">目标日期</div>
+              <div>{new Date(healthGoal.targetDate).toLocaleDateString()}</div>
+              <Tag theme={goalStatusMap[healthGoal.goalStatus].theme} className="mt-2">
+                {goalStatusMap[healthGoal.goalStatus].text}
+              </Tag>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      <Card
+        title={"健康体检提醒"}
+        actions={(
+          <Button theme="primary" variant="text" icon={<AddIcon/>}>
+            设置提醒
+          </Button>
+        )}
+      >
+        <div className={"w-full flex flex-row items-center justify-between p-4"}>
+          {healthCheckReminder && (
+            <>
+              <Statistic
+                title="下次体检时间"
+                value={healthCheckReminder.scheduledTime}
+              />
+              <Statistic
+                title="检查周期"
+                value={healthCheckReminder.checkFrequencyDays}
+                unit="天"
+              />
+              <div>
+                <div className="text-sm text-gray-500 mb-1">提醒内容</div>
+                <div>{healthCheckReminder.reminderContent}</div>
+              </div>
+            </>
+          )}
+        </div>
+      </Card>
+
     </div>
   )
 }

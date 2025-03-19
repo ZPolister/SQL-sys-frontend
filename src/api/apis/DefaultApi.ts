@@ -1001,7 +1001,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * 获取当前用户最近一次未完成的体检提醒
      * 获取最近一次体检提醒信息
      */
-    async getHealthCheckReminderRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<HealthCheckReminderDto>> {
+    async getHealthCheckReminderRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseResultHealthCheckReminderDto>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -1013,14 +1013,14 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => HealthCheckReminderDtoFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseResultHealthCheckReminderDtoFromJSON(jsonValue));
     }
 
     /**
      * 获取当前用户最近一次未完成的体检提醒
      * 获取最近一次体检提醒信息
      */
-    async getHealthCheckReminder(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<HealthCheckReminderDto> {
+    async getHealthCheckReminder(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResultHealthCheckReminderDto> {
         const response = await this.getHealthCheckReminderRaw(initOverrides);
         return await response.value();
     }
@@ -1068,7 +1068,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * 分页获取当前用户的体检提醒列表，可按日期范围筛选
      * 获取体检提醒列表
      */
-    async getHealthCheckReminderListRaw(requestParameters: GetHealthCheckReminderListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseResult>> {
+    async getHealthCheckReminderListRaw(requestParameters: GetHealthCheckReminderListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseResultPageHealthCheckReminder>> {
         const queryParameters: any = {};
 
         if (requestParameters['startDate'] != null) {
@@ -1096,14 +1096,14 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseResultFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseResultPageHealthCheckReminderFromJSON(jsonValue));
     }
 
     /**
      * 分页获取当前用户的体检提醒列表，可按日期范围筛选
      * 获取体检提醒列表
      */
-    async getHealthCheckReminderList(requestParameters: GetHealthCheckReminderListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResult> {
+    async getHealthCheckReminderList(requestParameters: GetHealthCheckReminderListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResultPageHealthCheckReminder> {
         const response = await this.getHealthCheckReminderListRaw(requestParameters, initOverrides);
         return await response.value();
     }

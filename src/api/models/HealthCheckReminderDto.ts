@@ -14,7 +14,7 @@
 
 import { mapValues } from '../runtime';
 /**
- * 体检提醒DTO
+ * 体检提醒信息
  * @export
  * @interface HealthCheckReminderDto
  */
