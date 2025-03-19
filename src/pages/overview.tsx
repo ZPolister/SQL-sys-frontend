@@ -60,7 +60,6 @@ export default function Overview() {
         const dietResponse = dietResult as ResponseResult;
         const sleepResponse = sleepResult as ResponseResult;
         const reminderResponse = reminderResult as ResponseResult;
-
         if (biometricResponse.code === 200 && biometricResponse.data) {
           setBiometricData(biometricResponse.data as BiometricRecordVo);
         }

@@ -13,8 +13,8 @@ export class HealthApp extends EventTarget {
     super();
 
     this.apiConfig = new Configuration({
-      basePath: __API_URL__,
-      // basePath: "/api",
+      // basePath: __API_URL__,
+      basePath: "/api",
       middleware: [
         {
           pre: context => {
