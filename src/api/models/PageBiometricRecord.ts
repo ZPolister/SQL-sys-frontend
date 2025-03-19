@@ -20,113 +20,113 @@ import {
     OrderItemToJSON,
     OrderItemToJSONTyped,
 } from './OrderItem';
-import type { PageObject } from './PageObject';
+import type { BiometricRecord } from './BiometricRecord';
 import {
-    PageObjectFromJSON,
-    PageObjectFromJSONTyped,
-    PageObjectToJSON,
-    PageObjectToJSONTyped,
-} from './PageObject';
+    BiometricRecordFromJSON,
+    BiometricRecordFromJSONTyped,
+    BiometricRecordToJSON,
+    BiometricRecordToJSONTyped,
+} from './BiometricRecord';
 
 /**
- * 
+ * 响应数据
  * @export
- * @interface Page
+ * @interface PageBiometricRecord
  */
-export interface Page {
+export interface PageBiometricRecord {
     /**
      * 
-     * @type {Array<object>}
-     * @memberof Page
+     * @type {Array<BiometricRecord>}
+     * @memberof PageBiometricRecord
      */
-    records?: Array<object>;
+    records?: Array<BiometricRecord>;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageBiometricRecord
      */
     total?: number;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageBiometricRecord
      */
     size?: number;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageBiometricRecord
      */
     current?: number;
     /**
      * 
      * @type {Array<OrderItem>}
-     * @memberof Page
+     * @memberof PageBiometricRecord
      */
     orders?: Array<OrderItem>;
     /**
      * 
-     * @type {PageObject}
-     * @memberof Page
+     * @type {PageBiometricRecord}
+     * @memberof PageBiometricRecord
      */
-    optimizeCountSql?: PageObject;
+    optimizeCountSql?: PageBiometricRecord;
     /**
      * 
-     * @type {PageObject}
-     * @memberof Page
+     * @type {PageBiometricRecord}
+     * @memberof PageBiometricRecord
      */
-    searchCount?: PageObject;
+    searchCount?: PageBiometricRecord;
     /**
      * 
      * @type {boolean}
-     * @memberof Page
+     * @memberof PageBiometricRecord
      */
     optimizeJoinOfCountSql?: boolean;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageBiometricRecord
      */
     maxLimit?: number;
     /**
      * 
      * @type {string}
-     * @memberof Page
+     * @memberof PageBiometricRecord
      */
     countId?: string;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageBiometricRecord
      * @deprecated
      */
     pages?: number;
 }
 
 /**
- * Check if a given object implements the Page interface.
+ * Check if a given object implements the PageBiometricRecord interface.
  */
-export function instanceOfPage(value: object): value is Page {
+export function instanceOfPageBiometricRecord(value: object): value is PageBiometricRecord {
     return true;
 }
 
-export function PageFromJSON(json: any): Page {
-    return PageFromJSONTyped(json, false);
+export function PageBiometricRecordFromJSON(json: any): PageBiometricRecord {
+    return PageBiometricRecordFromJSONTyped(json, false);
 }
 
-export function PageFromJSONTyped(json: any, ignoreDiscriminator: boolean): Page {
+export function PageBiometricRecordFromJSONTyped(json: any, ignoreDiscriminator: boolean): PageBiometricRecord {
     if (json == null) {
         return json;
     }
     return {
         
-        'records': json['records'] == null ? undefined : json['records'],
+        'records': json['records'] == null ? undefined : ((json['records'] as Array<any>).map(BiometricRecordFromJSON)),
         'total': json['total'] == null ? undefined : json['total'],
         'size': json['size'] == null ? undefined : json['size'],
         'current': json['current'] == null ? undefined : json['current'],
         'orders': json['orders'] == null ? undefined : ((json['orders'] as Array<any>).map(OrderItemFromJSON)),
-        'optimizeCountSql': json['optimizeCountSql'] == null ? undefined : PageObjectFromJSON(json['optimizeCountSql']),
-        'searchCount': json['searchCount'] == null ? undefined : PageObjectFromJSON(json['searchCount']),
+        'optimizeCountSql': json['optimizeCountSql'] == null ? undefined : PageBiometricRecordFromJSON(json['optimizeCountSql']),
+        'searchCount': json['searchCount'] == null ? undefined : PageBiometricRecordFromJSON(json['searchCount']),
         'optimizeJoinOfCountSql': json['optimizeJoinOfCountSql'] == null ? undefined : json['optimizeJoinOfCountSql'],
         'maxLimit': json['maxLimit'] == null ? undefined : json['maxLimit'],
         'countId': json['countId'] == null ? undefined : json['countId'],
@@ -134,24 +134,24 @@ export function PageFromJSONTyped(json: any, ignoreDiscriminator: boolean): Page
     };
 }
 
-export function PageToJSON(json: any): Page {
-    return PageToJSONTyped(json, false);
+export function PageBiometricRecordToJSON(json: any): PageBiometricRecord {
+    return PageBiometricRecordToJSONTyped(json, false);
 }
 
-export function PageToJSONTyped(value?: Page | null, ignoreDiscriminator: boolean = false): any {
+export function PageBiometricRecordToJSONTyped(value?: PageBiometricRecord | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'records': value['records'],
+        'records': value['records'] == null ? undefined : ((value['records'] as Array<any>).map(BiometricRecordToJSON)),
         'total': value['total'],
         'size': value['size'],
         'current': value['current'],
         'orders': value['orders'] == null ? undefined : ((value['orders'] as Array<any>).map(OrderItemToJSON)),
-        'optimizeCountSql': PageObjectToJSON(value['optimizeCountSql']),
-        'searchCount': PageObjectToJSON(value['searchCount']),
+        'optimizeCountSql': PageBiometricRecordToJSON(value['optimizeCountSql']),
+        'searchCount': PageBiometricRecordToJSON(value['searchCount']),
         'optimizeJoinOfCountSql': value['optimizeJoinOfCountSql'],
         'maxLimit': value['maxLimit'],
         'countId': value['countId'],

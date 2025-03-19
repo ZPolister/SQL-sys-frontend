@@ -16,41 +16,41 @@ import { mapValues } from '../runtime';
 /**
  * 通用响应结果
  * @export
- * @interface ResponseResult
+ * @interface ResponseResultLong
  */
-export interface ResponseResult {
+export interface ResponseResultLong {
     /**
      * 状态码
      * @type {number}
-     * @memberof ResponseResult
+     * @memberof ResponseResultLong
      */
     code?: number;
     /**
      * 提示信息
      * @type {string}
-     * @memberof ResponseResult
+     * @memberof ResponseResultLong
      */
     msg?: string;
     /**
      * 响应数据
-     * @type {object}
-     * @memberof ResponseResult
+     * @type {number}
+     * @memberof ResponseResultLong
      */
-    data?: object;
+    data?: number;
 }
 
 /**
- * Check if a given object implements the ResponseResult interface.
+ * Check if a given object implements the ResponseResultLong interface.
  */
-export function instanceOfResponseResult(value: object): value is ResponseResult {
+export function instanceOfResponseResultLong(value: object): value is ResponseResultLong {
     return true;
 }
 
-export function ResponseResultFromJSON(json: any): ResponseResult {
-    return ResponseResultFromJSONTyped(json, false);
+export function ResponseResultLongFromJSON(json: any): ResponseResultLong {
+    return ResponseResultLongFromJSONTyped(json, false);
 }
 
-export function ResponseResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): ResponseResult {
+export function ResponseResultLongFromJSONTyped(json: any, ignoreDiscriminator: boolean): ResponseResultLong {
     if (json == null) {
         return json;
     }
@@ -62,11 +62,11 @@ export function ResponseResultFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function ResponseResultToJSON(json: any): ResponseResult {
-    return ResponseResultToJSONTyped(json, false);
+export function ResponseResultLongToJSON(json: any): ResponseResultLong {
+    return ResponseResultLongToJSONTyped(json, false);
 }
 
-export function ResponseResultToJSONTyped(value?: ResponseResult | null, ignoreDiscriminator: boolean = false): any {
+export function ResponseResultLongToJSONTyped(value?: ResponseResultLong | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

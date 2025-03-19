@@ -16,41 +16,41 @@ import { mapValues } from '../runtime';
 /**
  * 通用响应结果
  * @export
- * @interface ResponseResult
+ * @interface ResponseResultMapStringString
  */
-export interface ResponseResult {
+export interface ResponseResultMapStringString {
     /**
      * 状态码
      * @type {number}
-     * @memberof ResponseResult
+     * @memberof ResponseResultMapStringString
      */
     code?: number;
     /**
      * 提示信息
      * @type {string}
-     * @memberof ResponseResult
+     * @memberof ResponseResultMapStringString
      */
     msg?: string;
     /**
      * 响应数据
-     * @type {object}
-     * @memberof ResponseResult
+     * @type {{ [key: string]: string; }}
+     * @memberof ResponseResultMapStringString
      */
-    data?: object;
+    data?: { [key: string]: string; };
 }
 
 /**
- * Check if a given object implements the ResponseResult interface.
+ * Check if a given object implements the ResponseResultMapStringString interface.
  */
-export function instanceOfResponseResult(value: object): value is ResponseResult {
+export function instanceOfResponseResultMapStringString(value: object): value is ResponseResultMapStringString {
     return true;
 }
 
-export function ResponseResultFromJSON(json: any): ResponseResult {
-    return ResponseResultFromJSONTyped(json, false);
+export function ResponseResultMapStringStringFromJSON(json: any): ResponseResultMapStringString {
+    return ResponseResultMapStringStringFromJSONTyped(json, false);
 }
 
-export function ResponseResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): ResponseResult {
+export function ResponseResultMapStringStringFromJSONTyped(json: any, ignoreDiscriminator: boolean): ResponseResultMapStringString {
     if (json == null) {
         return json;
     }
@@ -62,11 +62,11 @@ export function ResponseResultFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function ResponseResultToJSON(json: any): ResponseResult {
-    return ResponseResultToJSONTyped(json, false);
+export function ResponseResultMapStringStringToJSON(json: any): ResponseResultMapStringString {
+    return ResponseResultMapStringStringToJSONTyped(json, false);
 }
 
-export function ResponseResultToJSONTyped(value?: ResponseResult | null, ignoreDiscriminator: boolean = false): any {
+export function ResponseResultMapStringStringToJSONTyped(value?: ResponseResultMapStringString | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -16,70 +16,90 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface BiometricRecordDto
+ * @interface BiometricRecord
  */
-export interface BiometricRecordDto {
+export interface BiometricRecord {
     /**
-     * 身高(cm)
+     * 
      * @type {number}
-     * @memberof BiometricRecordDto
+     * @memberof BiometricRecord
+     */
+    recordId?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof BiometricRecord
+     */
+    accountId?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof BiometricRecord
      */
     heightCm?: number;
     /**
-     * 体重(kg)
+     * 
      * @type {number}
-     * @memberof BiometricRecordDto
+     * @memberof BiometricRecord
      */
     weightKg?: number;
     /**
-     * 收缩压(mmHg)
+     * 
      * @type {number}
-     * @memberof BiometricRecordDto
+     * @memberof BiometricRecord
      */
     systolicPressure?: number;
     /**
-     * 舒张压(mmHg)
+     * 
      * @type {number}
-     * @memberof BiometricRecordDto
+     * @memberof BiometricRecord
      */
     diastolicPressure?: number;
     /**
-     * 血糖(mmol/L)
+     * 
      * @type {number}
-     * @memberof BiometricRecordDto
+     * @memberof BiometricRecord
      */
     bloodGlucose?: number;
     /**
-     * 血脂(mmol/L)
+     * 
      * @type {number}
-     * @memberof BiometricRecordDto
+     * @memberof BiometricRecord
      */
     bloodLipid?: number;
     /**
-     * 测量时间
+     * 
      * @type {Date}
-     * @memberof BiometricRecordDto
+     * @memberof BiometricRecord
      */
     measurementTime?: Date;
+    /**
+     * 
+     * @type {Date}
+     * @memberof BiometricRecord
+     */
+    createdAt?: Date;
 }
 
 /**
- * Check if a given object implements the BiometricRecordDto interface.
+ * Check if a given object implements the BiometricRecord interface.
  */
-export function instanceOfBiometricRecordDto(value: object): value is BiometricRecordDto {
+export function instanceOfBiometricRecord(value: object): value is BiometricRecord {
     return true;
 }
 
-export function BiometricRecordDtoFromJSON(json: any): BiometricRecordDto {
-    return BiometricRecordDtoFromJSONTyped(json, false);
+export function BiometricRecordFromJSON(json: any): BiometricRecord {
+    return BiometricRecordFromJSONTyped(json, false);
 }
 
-export function BiometricRecordDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): BiometricRecordDto {
+export function BiometricRecordFromJSONTyped(json: any, ignoreDiscriminator: boolean): BiometricRecord {
     if (json == null) {
         return json;
     }
     return {
         
+        'recordId': json['recordId'] == null ? undefined : json['recordId'],
+        'accountId': json['accountId'] == null ? undefined : json['accountId'],
         'heightCm': json['heightCm'] == null ? undefined : json['heightCm'],
         'weightKg': json['weightKg'] == null ? undefined : json['weightKg'],
         'systolicPressure': json['systolicPressure'] == null ? undefined : json['systolicPressure'],
@@ -87,20 +107,23 @@ export function BiometricRecordDtoFromJSONTyped(json: any, ignoreDiscriminator: 
         'bloodGlucose': json['bloodGlucose'] == null ? undefined : json['bloodGlucose'],
         'bloodLipid': json['bloodLipid'] == null ? undefined : json['bloodLipid'],
         'measurementTime': json['measurementTime'] == null ? undefined : (new Date(json['measurementTime'])),
+        'createdAt': json['createdAt'] == null ? undefined : (new Date(json['createdAt'])),
     };
 }
 
-export function BiometricRecordDtoToJSON(json: any): BiometricRecordDto {
-    return BiometricRecordDtoToJSONTyped(json, false);
+export function BiometricRecordToJSON(json: any): BiometricRecord {
+    return BiometricRecordToJSONTyped(json, false);
 }
 
-export function BiometricRecordDtoToJSONTyped(value?: BiometricRecordDto | null, ignoreDiscriminator: boolean = false): any {
+export function BiometricRecordToJSONTyped(value?: BiometricRecord | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'recordId': value['recordId'],
+        'accountId': value['accountId'],
         'heightCm': value['heightCm'],
         'weightKg': value['weightKg'],
         'systolicPressure': value['systolicPressure'],
@@ -108,6 +131,7 @@ export function BiometricRecordDtoToJSONTyped(value?: BiometricRecordDto | null,
         'bloodGlucose': value['bloodGlucose'],
         'bloodLipid': value['bloodLipid'],
         'measurementTime': value['measurementTime'] == null ? undefined : ((value['measurementTime']).toISOString()),
+        'createdAt': value['createdAt'] == null ? undefined : ((value['createdAt']).toISOString()),
     };
 }
 

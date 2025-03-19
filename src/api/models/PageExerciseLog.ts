@@ -20,113 +20,113 @@ import {
     OrderItemToJSON,
     OrderItemToJSONTyped,
 } from './OrderItem';
-import type { PageObject } from './PageObject';
+import type { ExerciseLog } from './ExerciseLog';
 import {
-    PageObjectFromJSON,
-    PageObjectFromJSONTyped,
-    PageObjectToJSON,
-    PageObjectToJSONTyped,
-} from './PageObject';
+    ExerciseLogFromJSON,
+    ExerciseLogFromJSONTyped,
+    ExerciseLogToJSON,
+    ExerciseLogToJSONTyped,
+} from './ExerciseLog';
 
 /**
- * 
+ * 响应数据
  * @export
- * @interface Page
+ * @interface PageExerciseLog
  */
-export interface Page {
+export interface PageExerciseLog {
     /**
      * 
-     * @type {Array<object>}
-     * @memberof Page
+     * @type {Array<ExerciseLog>}
+     * @memberof PageExerciseLog
      */
-    records?: Array<object>;
+    records?: Array<ExerciseLog>;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageExerciseLog
      */
     total?: number;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageExerciseLog
      */
     size?: number;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageExerciseLog
      */
     current?: number;
     /**
      * 
      * @type {Array<OrderItem>}
-     * @memberof Page
+     * @memberof PageExerciseLog
      */
     orders?: Array<OrderItem>;
     /**
      * 
-     * @type {PageObject}
-     * @memberof Page
+     * @type {PageExerciseLog}
+     * @memberof PageExerciseLog
      */
-    optimizeCountSql?: PageObject;
+    optimizeCountSql?: PageExerciseLog;
     /**
      * 
-     * @type {PageObject}
-     * @memberof Page
+     * @type {PageExerciseLog}
+     * @memberof PageExerciseLog
      */
-    searchCount?: PageObject;
+    searchCount?: PageExerciseLog;
     /**
      * 
      * @type {boolean}
-     * @memberof Page
+     * @memberof PageExerciseLog
      */
     optimizeJoinOfCountSql?: boolean;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageExerciseLog
      */
     maxLimit?: number;
     /**
      * 
      * @type {string}
-     * @memberof Page
+     * @memberof PageExerciseLog
      */
     countId?: string;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageExerciseLog
      * @deprecated
      */
     pages?: number;
 }
 
 /**
- * Check if a given object implements the Page interface.
+ * Check if a given object implements the PageExerciseLog interface.
  */
-export function instanceOfPage(value: object): value is Page {
+export function instanceOfPageExerciseLog(value: object): value is PageExerciseLog {
     return true;
 }
 
-export function PageFromJSON(json: any): Page {
-    return PageFromJSONTyped(json, false);
+export function PageExerciseLogFromJSON(json: any): PageExerciseLog {
+    return PageExerciseLogFromJSONTyped(json, false);
 }
 
-export function PageFromJSONTyped(json: any, ignoreDiscriminator: boolean): Page {
+export function PageExerciseLogFromJSONTyped(json: any, ignoreDiscriminator: boolean): PageExerciseLog {
     if (json == null) {
         return json;
     }
     return {
         
-        'records': json['records'] == null ? undefined : json['records'],
+        'records': json['records'] == null ? undefined : ((json['records'] as Array<any>).map(ExerciseLogFromJSON)),
         'total': json['total'] == null ? undefined : json['total'],
         'size': json['size'] == null ? undefined : json['size'],
         'current': json['current'] == null ? undefined : json['current'],
         'orders': json['orders'] == null ? undefined : ((json['orders'] as Array<any>).map(OrderItemFromJSON)),
-        'optimizeCountSql': json['optimizeCountSql'] == null ? undefined : PageObjectFromJSON(json['optimizeCountSql']),
-        'searchCount': json['searchCount'] == null ? undefined : PageObjectFromJSON(json['searchCount']),
+        'optimizeCountSql': json['optimizeCountSql'] == null ? undefined : PageExerciseLogFromJSON(json['optimizeCountSql']),
+        'searchCount': json['searchCount'] == null ? undefined : PageExerciseLogFromJSON(json['searchCount']),
         'optimizeJoinOfCountSql': json['optimizeJoinOfCountSql'] == null ? undefined : json['optimizeJoinOfCountSql'],
         'maxLimit': json['maxLimit'] == null ? undefined : json['maxLimit'],
         'countId': json['countId'] == null ? undefined : json['countId'],
@@ -134,24 +134,24 @@ export function PageFromJSONTyped(json: any, ignoreDiscriminator: boolean): Page
     };
 }
 
-export function PageToJSON(json: any): Page {
-    return PageToJSONTyped(json, false);
+export function PageExerciseLogToJSON(json: any): PageExerciseLog {
+    return PageExerciseLogToJSONTyped(json, false);
 }
 
-export function PageToJSONTyped(value?: Page | null, ignoreDiscriminator: boolean = false): any {
+export function PageExerciseLogToJSONTyped(value?: PageExerciseLog | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'records': value['records'],
+        'records': value['records'] == null ? undefined : ((value['records'] as Array<any>).map(ExerciseLogToJSON)),
         'total': value['total'],
         'size': value['size'],
         'current': value['current'],
         'orders': value['orders'] == null ? undefined : ((value['orders'] as Array<any>).map(OrderItemToJSON)),
-        'optimizeCountSql': PageObjectToJSON(value['optimizeCountSql']),
-        'searchCount': PageObjectToJSON(value['searchCount']),
+        'optimizeCountSql': PageExerciseLogToJSON(value['optimizeCountSql']),
+        'searchCount': PageExerciseLogToJSON(value['searchCount']),
         'optimizeJoinOfCountSql': value['optimizeJoinOfCountSql'],
         'maxLimit': value['maxLimit'],
         'countId': value['countId'],

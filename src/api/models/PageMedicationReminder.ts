@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { MedicationReminder } from './MedicationReminder';
+import {
+    MedicationReminderFromJSON,
+    MedicationReminderFromJSONTyped,
+    MedicationReminderToJSON,
+    MedicationReminderToJSONTyped,
+} from './MedicationReminder';
 import type { OrderItem } from './OrderItem';
 import {
     OrderItemFromJSON,
@@ -20,113 +27,106 @@ import {
     OrderItemToJSON,
     OrderItemToJSONTyped,
 } from './OrderItem';
-import type { PageObject } from './PageObject';
-import {
-    PageObjectFromJSON,
-    PageObjectFromJSONTyped,
-    PageObjectToJSON,
-    PageObjectToJSONTyped,
-} from './PageObject';
 
 /**
- * 
+ * 响应数据
  * @export
- * @interface Page
+ * @interface PageMedicationReminder
  */
-export interface Page {
+export interface PageMedicationReminder {
     /**
      * 
-     * @type {Array<object>}
-     * @memberof Page
+     * @type {Array<MedicationReminder>}
+     * @memberof PageMedicationReminder
      */
-    records?: Array<object>;
+    records?: Array<MedicationReminder>;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageMedicationReminder
      */
     total?: number;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageMedicationReminder
      */
     size?: number;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageMedicationReminder
      */
     current?: number;
     /**
      * 
      * @type {Array<OrderItem>}
-     * @memberof Page
+     * @memberof PageMedicationReminder
      */
     orders?: Array<OrderItem>;
     /**
      * 
-     * @type {PageObject}
-     * @memberof Page
+     * @type {PageMedicationReminder}
+     * @memberof PageMedicationReminder
      */
-    optimizeCountSql?: PageObject;
+    optimizeCountSql?: PageMedicationReminder;
     /**
      * 
-     * @type {PageObject}
-     * @memberof Page
+     * @type {PageMedicationReminder}
+     * @memberof PageMedicationReminder
      */
-    searchCount?: PageObject;
+    searchCount?: PageMedicationReminder;
     /**
      * 
      * @type {boolean}
-     * @memberof Page
+     * @memberof PageMedicationReminder
      */
     optimizeJoinOfCountSql?: boolean;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageMedicationReminder
      */
     maxLimit?: number;
     /**
      * 
      * @type {string}
-     * @memberof Page
+     * @memberof PageMedicationReminder
      */
     countId?: string;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageMedicationReminder
      * @deprecated
      */
     pages?: number;
 }
 
 /**
- * Check if a given object implements the Page interface.
+ * Check if a given object implements the PageMedicationReminder interface.
  */
-export function instanceOfPage(value: object): value is Page {
+export function instanceOfPageMedicationReminder(value: object): value is PageMedicationReminder {
     return true;
 }
 
-export function PageFromJSON(json: any): Page {
-    return PageFromJSONTyped(json, false);
+export function PageMedicationReminderFromJSON(json: any): PageMedicationReminder {
+    return PageMedicationReminderFromJSONTyped(json, false);
 }
 
-export function PageFromJSONTyped(json: any, ignoreDiscriminator: boolean): Page {
+export function PageMedicationReminderFromJSONTyped(json: any, ignoreDiscriminator: boolean): PageMedicationReminder {
     if (json == null) {
         return json;
     }
     return {
         
-        'records': json['records'] == null ? undefined : json['records'],
+        'records': json['records'] == null ? undefined : ((json['records'] as Array<any>).map(MedicationReminderFromJSON)),
         'total': json['total'] == null ? undefined : json['total'],
         'size': json['size'] == null ? undefined : json['size'],
         'current': json['current'] == null ? undefined : json['current'],
         'orders': json['orders'] == null ? undefined : ((json['orders'] as Array<any>).map(OrderItemFromJSON)),
-        'optimizeCountSql': json['optimizeCountSql'] == null ? undefined : PageObjectFromJSON(json['optimizeCountSql']),
-        'searchCount': json['searchCount'] == null ? undefined : PageObjectFromJSON(json['searchCount']),
+        'optimizeCountSql': json['optimizeCountSql'] == null ? undefined : PageMedicationReminderFromJSON(json['optimizeCountSql']),
+        'searchCount': json['searchCount'] == null ? undefined : PageMedicationReminderFromJSON(json['searchCount']),
         'optimizeJoinOfCountSql': json['optimizeJoinOfCountSql'] == null ? undefined : json['optimizeJoinOfCountSql'],
         'maxLimit': json['maxLimit'] == null ? undefined : json['maxLimit'],
         'countId': json['countId'] == null ? undefined : json['countId'],
@@ -134,24 +134,24 @@ export function PageFromJSONTyped(json: any, ignoreDiscriminator: boolean): Page
     };
 }
 
-export function PageToJSON(json: any): Page {
-    return PageToJSONTyped(json, false);
+export function PageMedicationReminderToJSON(json: any): PageMedicationReminder {
+    return PageMedicationReminderToJSONTyped(json, false);
 }
 
-export function PageToJSONTyped(value?: Page | null, ignoreDiscriminator: boolean = false): any {
+export function PageMedicationReminderToJSONTyped(value?: PageMedicationReminder | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'records': value['records'],
+        'records': value['records'] == null ? undefined : ((value['records'] as Array<any>).map(MedicationReminderToJSON)),
         'total': value['total'],
         'size': value['size'],
         'current': value['current'],
         'orders': value['orders'] == null ? undefined : ((value['orders'] as Array<any>).map(OrderItemToJSON)),
-        'optimizeCountSql': PageObjectToJSON(value['optimizeCountSql']),
-        'searchCount': PageObjectToJSON(value['searchCount']),
+        'optimizeCountSql': PageMedicationReminderToJSON(value['optimizeCountSql']),
+        'searchCount': PageMedicationReminderToJSON(value['searchCount']),
         'optimizeJoinOfCountSql': value['optimizeJoinOfCountSql'],
         'maxLimit': value['maxLimit'],
         'countId': value['countId'],

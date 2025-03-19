@@ -16,41 +16,41 @@ import { mapValues } from '../runtime';
 /**
  * 通用响应结果
  * @export
- * @interface ResponseResult
+ * @interface ResponseResultVoid
  */
-export interface ResponseResult {
+export interface ResponseResultVoid {
     /**
      * 状态码
      * @type {number}
-     * @memberof ResponseResult
+     * @memberof ResponseResultVoid
      */
     code?: number;
     /**
      * 提示信息
      * @type {string}
-     * @memberof ResponseResult
+     * @memberof ResponseResultVoid
      */
     msg?: string;
     /**
      * 响应数据
      * @type {object}
-     * @memberof ResponseResult
+     * @memberof ResponseResultVoid
      */
     data?: object;
 }
 
 /**
- * Check if a given object implements the ResponseResult interface.
+ * Check if a given object implements the ResponseResultVoid interface.
  */
-export function instanceOfResponseResult(value: object): value is ResponseResult {
+export function instanceOfResponseResultVoid(value: object): value is ResponseResultVoid {
     return true;
 }
 
-export function ResponseResultFromJSON(json: any): ResponseResult {
-    return ResponseResultFromJSONTyped(json, false);
+export function ResponseResultVoidFromJSON(json: any): ResponseResultVoid {
+    return ResponseResultVoidFromJSONTyped(json, false);
 }
 
-export function ResponseResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): ResponseResult {
+export function ResponseResultVoidFromJSONTyped(json: any, ignoreDiscriminator: boolean): ResponseResultVoid {
     if (json == null) {
         return json;
     }
@@ -62,11 +62,11 @@ export function ResponseResultFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function ResponseResultToJSON(json: any): ResponseResult {
-    return ResponseResultToJSONTyped(json, false);
+export function ResponseResultVoidToJSON(json: any): ResponseResultVoid {
+    return ResponseResultVoidToJSONTyped(json, false);
 }
 
-export function ResponseResultToJSONTyped(value?: ResponseResult | null, ignoreDiscriminator: boolean = false): any {
+export function ResponseResultVoidToJSONTyped(value?: ResponseResultVoid | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

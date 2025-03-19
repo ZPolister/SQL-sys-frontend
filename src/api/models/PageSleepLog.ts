@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { SleepLog } from './SleepLog';
+import {
+    SleepLogFromJSON,
+    SleepLogFromJSONTyped,
+    SleepLogToJSON,
+    SleepLogToJSONTyped,
+} from './SleepLog';
 import type { OrderItem } from './OrderItem';
 import {
     OrderItemFromJSON,
@@ -20,113 +27,106 @@ import {
     OrderItemToJSON,
     OrderItemToJSONTyped,
 } from './OrderItem';
-import type { PageObject } from './PageObject';
-import {
-    PageObjectFromJSON,
-    PageObjectFromJSONTyped,
-    PageObjectToJSON,
-    PageObjectToJSONTyped,
-} from './PageObject';
 
 /**
- * 
+ * 响应数据
  * @export
- * @interface Page
+ * @interface PageSleepLog
  */
-export interface Page {
+export interface PageSleepLog {
     /**
      * 
-     * @type {Array<object>}
-     * @memberof Page
+     * @type {Array<SleepLog>}
+     * @memberof PageSleepLog
      */
-    records?: Array<object>;
+    records?: Array<SleepLog>;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageSleepLog
      */
     total?: number;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageSleepLog
      */
     size?: number;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageSleepLog
      */
     current?: number;
     /**
      * 
      * @type {Array<OrderItem>}
-     * @memberof Page
+     * @memberof PageSleepLog
      */
     orders?: Array<OrderItem>;
     /**
      * 
-     * @type {PageObject}
-     * @memberof Page
+     * @type {PageSleepLog}
+     * @memberof PageSleepLog
      */
-    optimizeCountSql?: PageObject;
+    optimizeCountSql?: PageSleepLog;
     /**
      * 
-     * @type {PageObject}
-     * @memberof Page
+     * @type {PageSleepLog}
+     * @memberof PageSleepLog
      */
-    searchCount?: PageObject;
+    searchCount?: PageSleepLog;
     /**
      * 
      * @type {boolean}
-     * @memberof Page
+     * @memberof PageSleepLog
      */
     optimizeJoinOfCountSql?: boolean;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageSleepLog
      */
     maxLimit?: number;
     /**
      * 
      * @type {string}
-     * @memberof Page
+     * @memberof PageSleepLog
      */
     countId?: string;
     /**
      * 
      * @type {number}
-     * @memberof Page
+     * @memberof PageSleepLog
      * @deprecated
      */
     pages?: number;
 }
 
 /**
- * Check if a given object implements the Page interface.
+ * Check if a given object implements the PageSleepLog interface.
  */
-export function instanceOfPage(value: object): value is Page {
+export function instanceOfPageSleepLog(value: object): value is PageSleepLog {
     return true;
 }
 
-export function PageFromJSON(json: any): Page {
-    return PageFromJSONTyped(json, false);
+export function PageSleepLogFromJSON(json: any): PageSleepLog {
+    return PageSleepLogFromJSONTyped(json, false);
 }
 
-export function PageFromJSONTyped(json: any, ignoreDiscriminator: boolean): Page {
+export function PageSleepLogFromJSONTyped(json: any, ignoreDiscriminator: boolean): PageSleepLog {
     if (json == null) {
         return json;
     }
     return {
         
-        'records': json['records'] == null ? undefined : json['records'],
+        'records': json['records'] == null ? undefined : ((json['records'] as Array<any>).map(SleepLogFromJSON)),
         'total': json['total'] == null ? undefined : json['total'],
         'size': json['size'] == null ? undefined : json['size'],
         'current': json['current'] == null ? undefined : json['current'],
         'orders': json['orders'] == null ? undefined : ((json['orders'] as Array<any>).map(OrderItemFromJSON)),
-        'optimizeCountSql': json['optimizeCountSql'] == null ? undefined : PageObjectFromJSON(json['optimizeCountSql']),
-        'searchCount': json['searchCount'] == null ? undefined : PageObjectFromJSON(json['searchCount']),
+        'optimizeCountSql': json['optimizeCountSql'] == null ? undefined : PageSleepLogFromJSON(json['optimizeCountSql']),
+        'searchCount': json['searchCount'] == null ? undefined : PageSleepLogFromJSON(json['searchCount']),
         'optimizeJoinOfCountSql': json['optimizeJoinOfCountSql'] == null ? undefined : json['optimizeJoinOfCountSql'],
         'maxLimit': json['maxLimit'] == null ? undefined : json['maxLimit'],
         'countId': json['countId'] == null ? undefined : json['countId'],
@@ -134,24 +134,24 @@ export function PageFromJSONTyped(json: any, ignoreDiscriminator: boolean): Page
     };
 }
 
-export function PageToJSON(json: any): Page {
-    return PageToJSONTyped(json, false);
+export function PageSleepLogToJSON(json: any): PageSleepLog {
+    return PageSleepLogToJSONTyped(json, false);
 }
 
-export function PageToJSONTyped(value?: Page | null, ignoreDiscriminator: boolean = false): any {
+export function PageSleepLogToJSONTyped(value?: PageSleepLog | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'records': value['records'],
+        'records': value['records'] == null ? undefined : ((value['records'] as Array<any>).map(SleepLogToJSON)),
         'total': value['total'],
         'size': value['size'],
         'current': value['current'],
         'orders': value['orders'] == null ? undefined : ((value['orders'] as Array<any>).map(OrderItemToJSON)),
-        'optimizeCountSql': PageObjectToJSON(value['optimizeCountSql']),
-        'searchCount': PageObjectToJSON(value['searchCount']),
+        'optimizeCountSql': PageSleepLogToJSON(value['optimizeCountSql']),
+        'searchCount': PageSleepLogToJSON(value['searchCount']),
         'optimizeJoinOfCountSql': value['optimizeJoinOfCountSql'],
         'maxLimit': value['maxLimit'],
         'countId': value['countId'],
