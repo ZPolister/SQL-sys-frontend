@@ -111,15 +111,14 @@ export interface BiometricRecordVo {
     bloodLipidLevel?: BiometricRecordVoBloodLipidLevelEnum;
 }
 
-
 /**
  * @export
  */
 export const BiometricRecordVoBmiLevelEnum = {
-    : '偏瘦',
-    2: '正常',
-    3: '超重',
-    4: '肥胖'
+    THIN: '偏瘦',
+    NORMAL: '正常',
+    OVERWEIGHT: '超重',
+    OBESE: '肥胖'
 } as const;
 export type BiometricRecordVoBmiLevelEnum = typeof BiometricRecordVoBmiLevelEnum[keyof typeof BiometricRecordVoBmiLevelEnum];
 
@@ -127,12 +126,12 @@ export type BiometricRecordVoBmiLevelEnum = typeof BiometricRecordVoBmiLevelEnum
  * @export
  */
 export const BiometricRecordVoBloodPressureLevelEnum = {
-    : '正常',
-    2: '正常偏高',
-    3: '轻度高血压前期',
-    _1: '1级高血压',
-    _2: '2级高血压',
-    _3: '3级高血压'
+    NORMAL: '正常',
+    HIGH_NORMAL: '正常偏高',
+    PRE_HYPERTENSION: '轻度高血压前期',
+    GRADE_1: '1级高血压',
+    GRADE_2: '2级高血压',
+    GRADE_3: '3级高血压'
 } as const;
 export type BiometricRecordVoBloodPressureLevelEnum = typeof BiometricRecordVoBloodPressureLevelEnum[keyof typeof BiometricRecordVoBloodPressureLevelEnum];
 
@@ -140,10 +139,10 @@ export type BiometricRecordVoBloodPressureLevelEnum = typeof BiometricRecordVoBl
  * @export
  */
 export const BiometricRecordVoBloodGlucoseLevelEnum = {
-    : '低血糖',
-    2: '正常',
-    3: '糖耐量受损',
-    4: '血糖偏高'
+    LOW: '低血糖',
+    NORMAL: '正常',
+    IMPAIRED: '糖耐量受损',
+    HIGH: '血糖偏高'
 } as const;
 export type BiometricRecordVoBloodGlucoseLevelEnum = typeof BiometricRecordVoBloodGlucoseLevelEnum[keyof typeof BiometricRecordVoBloodGlucoseLevelEnum];
 
@@ -151,12 +150,11 @@ export type BiometricRecordVoBloodGlucoseLevelEnum = typeof BiometricRecordVoBlo
  * @export
  */
 export const BiometricRecordVoBloodLipidLevelEnum = {
-    : '正常',
-    2: '边缘升高',
-    3: '升高'
+    NORMAL: '正常',
+    BORDERLINE: '边缘升高',
+    HIGH: '升高'
 } as const;
 export type BiometricRecordVoBloodLipidLevelEnum = typeof BiometricRecordVoBloodLipidLevelEnum[keyof typeof BiometricRecordVoBloodLipidLevelEnum];
-
 
 /**
  * Check if a given object implements the BiometricRecordVo interface.
@@ -174,7 +172,7 @@ export function BiometricRecordVoFromJSONTyped(json: any, ignoreDiscriminator: b
         return json;
     }
     return {
-        
+
         'recordId': json['recordId'] == null ? undefined : json['recordId'],
         'accountId': json['accountId'] == null ? undefined : json['accountId'],
         'heightCm': json['heightCm'] == null ? undefined : json['heightCm'],
@@ -203,7 +201,7 @@ export function BiometricRecordVoToJSONTyped(value?: BiometricRecordVo | null, i
     }
 
     return {
-        
+
         'recordId': value['recordId'],
         'accountId': value['accountId'],
         'heightCm': value['heightCm'],
@@ -221,4 +219,3 @@ export function BiometricRecordVoToJSONTyped(value?: BiometricRecordVo | null, i
         'bloodLipidLevel': value['bloodLipidLevel'],
     };
 }
-

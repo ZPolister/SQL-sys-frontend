@@ -6,9 +6,9 @@ import {
     ExerciseLogDto,
     SleepLogDto,
     HealthCheckReminderDto,
-    BiometricRecordVo
-} from "../api/models";
-import {DefaultApi} from "../api/apis/DefaultApi";
+    ResponseResult, BiometricRecordVo
+} from "../api";
+import {$app} from "../app/app";
 
 const DataCard = ({title}: { title: string }) => {
   return (
@@ -35,7 +35,7 @@ export default function Overview() {
   const [healthCheckReminder, setHealthCheckReminder] = useState<HealthCheckReminderDto | null>(null);
 
   useEffect(() => {
-    const api = new DefaultApi();
+      const api = $app.$DefaultApi;
 
     // 获取所有数据
     const fetchData = async () => {
@@ -51,27 +51,34 @@ export default function Overview() {
           api.getExerciseLatest(),
           api.getDietHotToday(),
           api.getSleepLatest(),
-          api.getHealthCheckReminderRaw()
+          api.getHealthCheckReminder()
         ]);
 
-        if (biometricResult.code === 200 && biometricResult.data) {
-          setBiometricData(biometricResult.data as BiometricRecordDto);
+        // 解构API响应
+        const biometricResponse = biometricResult as ResponseResult;
+        const exerciseResponse = exerciseResult as ResponseResult;
+        const dietResponse = dietResult as ResponseResult;
+        const sleepResponse = sleepResult as ResponseResult;
+        const reminderResponse = reminderResult as ResponseResult;
+
+        if (biometricResponse.code === 200 && biometricResponse.data) {
+          setBiometricData(biometricResponse.data as BiometricRecordVo);
         }
 
-        if (exerciseResult.code === 200 && exerciseResult.data) {
-          setExerciseData(exerciseResult.data as ExerciseLogDto);
+        if (exerciseResponse.code === 200 && exerciseResponse.data) {
+          setExerciseData(exerciseResponse.data as ExerciseLogDto);
         }
 
-        if (dietResult.code === 200 && dietResult.data !== undefined) {
-          setDietCalories(dietResult.data as number);
+        if (dietResponse.code === 200 && dietResponse.data !== undefined) {
+          setDietCalories(dietResponse.data as number);
         }
 
-        if (sleepResult.code === 200 && sleepResult.data) {
-          setSleepData(sleepResult.data as SleepLogDto);
+        if (sleepResponse.code === 200 && sleepResponse.data) {
+          setSleepData(sleepResponse.data as SleepLogDto);
         }
 
-        if (reminderResult.code === 200 && reminderResult.data) {
-          setHealthCheckReminder(reminderResult.data);
+        if (reminderResponse.code === 200 && reminderResponse.data) {
+          setHealthCheckReminder(reminderResponse.data as HealthCheckReminderDto);
         }
       } catch (error) {
         console.error('Failed to fetch overview data:', error);
@@ -96,7 +103,7 @@ export default function Overview() {
             <>
               <Statistic
                 title="下次体检时间"
-                value={"toLocaleDateString" in healthCheckReminder.scheduledTime ? healthCheckReminder.scheduledTime.toLocaleDateString() :}
+                value={healthCheckReminder.scheduledTime}
               />
               <Statistic
                 title="检查周期"
