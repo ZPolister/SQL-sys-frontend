@@ -22,7 +22,6 @@ import type {
   HealthGoalDto,
   LoginDto,
   MedicationReminderDto,
-  PageResult,
   RegisterDto,
   ResponseResult,
   ResponseResultBiometricChartDataDto,
@@ -61,8 +60,6 @@ import {
     LoginDtoToJSON,
     MedicationReminderDtoFromJSON,
     MedicationReminderDtoToJSON,
-    PageResultFromJSON,
-    PageResultToJSON,
     RegisterDtoFromJSON,
     RegisterDtoToJSON,
     ResponseResultFromJSON,
@@ -146,8 +143,8 @@ export interface GetDietDailyCaloriesRequest {
 }
 
 export interface GetDietPageRequest {
-    startDate: Date;
-    endDate: Date;
+    startDate: string;
+    endDate: string;
     pageNum?: number;
     pageSize?: number;
 }
@@ -674,7 +671,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * 支持按日期范围筛选
      * 分页查询饮食记录
      */
-    async getDietPageRaw(requestParameters: GetDietPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageResult>> {
+    async getDietPageRaw(requestParameters: GetDietPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseResultPageDietLog>> {
         if (requestParameters['startDate'] == null) {
             throw new runtime.RequiredError(
                 'startDate',
@@ -692,11 +689,11 @@ export class DefaultApi extends runtime.BaseAPI {
         const queryParameters: any = {};
 
         if (requestParameters['startDate'] != null) {
-            queryParameters['startDate'] = (requestParameters['startDate'] as any).toISOString();
+            queryParameters['startDate'] = (requestParameters['startDate'] as any);
         }
 
         if (requestParameters['endDate'] != null) {
-            queryParameters['endDate'] = (requestParameters['endDate'] as any).toISOString();
+            queryParameters['endDate'] = (requestParameters['endDate'] as any);
         }
 
         if (requestParameters['pageNum'] != null) {
@@ -716,14 +713,14 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PageResultFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseResultPageDietLogFromJSON(jsonValue));
     }
 
     /**
      * 支持按日期范围筛选
      * 分页查询饮食记录
      */
-    async getDietPage(requestParameters: GetDietPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PageResult> {
+    async getDietPage(requestParameters: GetDietPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResultPageDietLog> {
         const response = await this.getDietPageRaw(requestParameters, initOverrides);
         return await response.value();
     }

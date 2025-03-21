@@ -85,7 +85,7 @@ export function DietLogDtoToJSONTyped(value?: DietLogDto | null, ignoreDiscrimin
         'foodItem': value['foodItem'],
         'quantityGrams': value['quantityGrams'],
         'totalCalories': value['totalCalories'],
-        'consumptionTime': value['consumptionTime'] == null ? undefined : ((value['consumptionTime']).toISOString()),
+        'consumptionTime': value['consumptionTime'] == null ? undefined : ((value['consumptionTime'])),
     };
 }
 
