@@ -1,29 +1,45 @@
-import { Button, Card, Dialog, Form, InputNumber, Table, DatePicker, DateRangePicker } from "tdesign-react";
+import {
+  Button,
+  Card,
+  Dialog,
+  Form,
+  InputNumber,
+  Table,
+  DatePicker,
+  DateRangePicker,
+} from "tdesign-react";
 import { useEffect, useState } from "react";
 import * as echarts from "echarts";
-import {BiometricRecordDto, BiometricRecordVo, ResponseResultPageBiometricRecordVo} from "../api";
+import {
+  BiometricRecordDto,
+  BiometricRecordVo,
+  ResponseResultPageBiometricRecordVo,
+} from "../api";
 import { $app } from "../app/app";
-
 
 const toDateString = (dt: Date) => {
   // 获取时间信息
-const year = dt.getFullYear() // 2021
-const month = dt.getMonth() // 8
-const date = dt.getDate() // 23
-// 拼接成字符串
-return `${year}-${month + 1}-${date}`
+  const year = dt.getFullYear(); // 2021
+  const month = dt.getMonth(); // 8
+  const date = dt.getDate(); // 23
+  // 拼接成字符串
+  return `${year}-${month + 1}-${date}`;
 };
 
 export default function BiometricData() {
   const [chartData, setChartData] = useState<any>(null);
   const [records, setRecords] = useState<BiometricRecordVo[]>([]);
-  const [pagination, setPagination] = useState({ pageNum: 1, pageSize: 10, total: 0 });
+  const [pagination, setPagination] = useState({
+    pageNum: 1,
+    pageSize: 10,
+    total: 0,
+  });
   const [visible, setVisible] = useState(false);
   const [timeRange, setTimeRange] = useState<string>("7d");
   // 设置默认时间范围为最近30天
   const [dateRange, setDateRange] = useState<[string, string]>([
     toDateString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
-    toDateString(new Date())
+    toDateString(new Date()),
   ]);
   const [formData, setFormData] = useState<BiometricRecordDto>({
     heightCm: 0,
@@ -37,6 +53,9 @@ export default function BiometricData() {
 
   useEffect(() => {
     fetchChartData();
+  }, [timeRange]);
+
+  useEffect(() => {
     fetchRecords();
   }, []);
 
@@ -46,15 +65,13 @@ export default function BiometricData() {
       const handleResize = () => {
         chart?.resize();
       };
-      window.addEventListener('resize', handleResize);
+      window.addEventListener("resize", handleResize);
       return () => {
-        window.removeEventListener('resize', handleResize);
+        window.removeEventListener("resize", handleResize);
         chart?.dispose();
       };
     }
   }, [chartData]);
-
-
 
   const fetchChartData = async () => {
     const api = $app.$DefaultApi;
@@ -66,17 +83,19 @@ export default function BiometricData() {
     const api = $app.$DefaultApi;
     // 使用 Date 对象作为参数
     const result = await api.getHealthRecords({
-      startTime: dateRange[0] ?
-        dateRange[0] : undefined,
-      endTime: dateRange[1] ?
-        dateRange[1] : undefined,
+      startTime: dateRange[0] ? dateRange[0] : undefined,
+      endTime: dateRange[1] ? dateRange[1] : undefined,
       pageNum: paginationParams.pageNum,
       pageSize: paginationParams.pageSize,
     });
     if (result.code === 200) {
-      const resultResponseRecord = result as ResponseResultPageBiometricRecordVo;
+      const resultResponseRecord =
+        result as ResponseResultPageBiometricRecordVo;
       setRecords(resultResponseRecord.data?.records || []);
-      setPagination({ ...pagination, total: resultResponseRecord.data?.total || 0 });
+      setPagination({
+        ...paginationParams,
+        total: resultResponseRecord.data?.total || 0,
+      });
     }
   };
 
@@ -88,30 +107,30 @@ export default function BiometricData() {
         tooltip: { trigger: "axis" },
         legend: {
           data: ["体重", "收缩压", "舒张压", "血糖", "血脂", "BMI"],
-          bottom: 0
+          bottom: 0,
         },
         grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '10%',
-          containLabel: true
+          left: "3%",
+          right: "4%",
+          bottom: "10%",
+          containLabel: true,
         },
         xAxis: {
           type: "category",
           data: chartData.dates,
-          boundaryGap: false
+          boundaryGap: false,
         },
         yAxis: [
           {
-            type: 'value',
-            name: '体重/血压',
-            position: 'left',
+            type: "value",
+            name: "体重/血压",
+            position: "left",
           },
           {
-            type: 'value',
-            name: '其他指标',
-            position: 'right'
-          }
+            type: "value",
+            name: "其他指标",
+            position: "right",
+          },
         ],
         series: [
           {
@@ -119,43 +138,43 @@ export default function BiometricData() {
             data: chartData.weights,
             type: "line",
             yAxisIndex: 0,
-            smooth: true
+            smooth: true,
           },
           {
             name: "收缩压",
             data: chartData.systolicPressures,
             type: "line",
             yAxisIndex: 0,
-            smooth: true
+            smooth: true,
           },
           {
             name: "舒张压",
             data: chartData.diastolicPressures,
             type: "line",
             yAxisIndex: 0,
-            smooth: true
+            smooth: true,
           },
           {
             name: "血糖",
             data: chartData.bloodGlucoses,
             type: "line",
             yAxisIndex: 1,
-            smooth: true
+            smooth: true,
           },
           {
             name: "血脂",
             data: chartData.bloodLipids,
             type: "line",
             yAxisIndex: 1,
-            smooth: true
+            smooth: true,
           },
           {
             name: "BMI",
             data: chartData.bmis,
             type: "line",
             yAxisIndex: 1,
-            smooth: true
-          }
+            smooth: true,
+          },
         ],
       };
       myChart.setOption(option);
@@ -172,7 +191,9 @@ export default function BiometricData() {
 
   const handleSubmit = async () => {
     const api = $app.$DefaultApi;
-    const result = await api.postHealthBiometric({ biometricRecordDto: formData });
+    const result = await api.postHealthBiometric({
+      biometricRecordDto: formData,
+    });
     if (result.code === 200) {
       setVisible(false);
       await fetchRecords();
@@ -190,7 +211,6 @@ export default function BiometricData() {
               variant={timeRange === "7d" ? "base" : "outline"}
               onClick={() => {
                 setTimeRange("7d");
-                fetchChartData();
               }}
             >
               近7天
@@ -199,7 +219,6 @@ export default function BiometricData() {
               variant={timeRange === "1m" ? "base" : "outline"}
               onClick={() => {
                 setTimeRange("1m");
-                fetchChartData();
               }}
             >
               近1月
@@ -208,7 +227,6 @@ export default function BiometricData() {
               variant={timeRange === "3m" ? "base" : "outline"}
               onClick={() => {
                 setTimeRange("3m");
-                fetchChartData();
               }}
             >
               近3月
@@ -217,7 +235,6 @@ export default function BiometricData() {
               variant={timeRange === "6m" ? "base" : "outline"}
               onClick={() => {
                 setTimeRange("6m");
-                fetchChartData();
               }}
             >
               近半年
@@ -233,95 +250,97 @@ export default function BiometricData() {
         <div className="mb-4 flex justify-between items-center">
           <div className="flex gap-4 items-center">
             <DateRangePicker
-              placeholder={['开始时间', '结束时间']}
+              placeholder={["开始时间", "结束时间"]}
               value={dateRange}
               onChange={(val) => {
                 if (Array.isArray(val) && val[0] && val[1]) {
                   setDateRange([
                     toDateString(new Date(val[0])),
-                    toDateString(new Date(val[1]))
+                    toDateString(new Date(val[1])),
                   ]);
                   fetchRecords();
                 }
               }}
             />
           </div>
-          <Button theme="primary" onClick={() => setVisible(true)}>新增记录</Button>
+          <Button theme="primary" onClick={() => setVisible(true)}>
+            新增记录
+          </Button>
         </div>
         <Table
           data={records}
           columns={[
             {
-              align: 'center',
+              align: "center",
               width: 100,
               ellipsis: true,
               title: "身高",
               colKey: "heightCm",
-              cell: ({ row }) => `${row.heightCm} cm`
+              cell: ({ row }) => `${row.heightCm} cm`,
             },
             {
-              align: 'center',
+              align: "center",
               width: 100,
               ellipsis: true,
               title: "体重",
               colKey: "weightKg",
-              cell: ({ row }) => `${row.weightKg} kg`
+              cell: ({ row }) => `${row.weightKg} kg`,
             },
             {
-              align: 'center',
+              align: "center",
               width: 100,
               ellipsis: true,
               title: "收缩压",
               colKey: "systolicPressure",
-              cell: ({ row }) => `${row.systolicPressure} mmHg`
+              cell: ({ row }) => `${row.systolicPressure} mmHg`,
             },
             {
-              align: 'center',
+              align: "center",
               width: 100,
               ellipsis: true,
               title: "舒张压",
               colKey: "diastolicPressure",
-              cell: ({ row }) => `${row.diastolicPressure} mmHg`
+              cell: ({ row }) => `${row.diastolicPressure} mmHg`,
             },
             {
-              align: 'center',
+              align: "center",
               width: 100,
               ellipsis: true,
               title: "血糖",
               colKey: "bloodGlucose",
-              cell: ({ row }) => `${row.bloodGlucose} mmol/L`
+              cell: ({ row }) => `${row.bloodGlucose} mmol/L`,
             },
             {
-              align: 'center',
+              align: "center",
               width: 100,
               ellipsis: true,
               title: "血脂",
               colKey: "bloodLipid",
-              cell: ({ row }) => `${row.bloodLipid} mmol/L`
+              cell: ({ row }) => `${row.bloodLipid} mmol/L`,
             },
             {
-              align: 'center',
+              align: "center",
               width: 160,
               ellipsis: true,
               title: "测量时间",
               colKey: "measurementTime",
               cell: ({ row }) => {
                 const date = row.measurementTime;
-                return date?.toLocaleString('zh-CN', {
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit',
-                  hour12: false
+                return date?.toLocaleString("zh-CN", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                  hour12: false,
                 });
-              }
+              },
             },
             {
-              align: 'center',
+              align: "center",
               width: 100,
-              fixed: 'right',
+              fixed: "right",
               title: "操作",
               colKey: "action",
               cell: ({ row }) => (
@@ -352,7 +371,7 @@ export default function BiometricData() {
               const newPagination = {
                 ...pagination,
                 pageNum: pageInfo.current,
-                pageSize: pageInfo.pageSize
+                pageSize: pageInfo.pageSize,
               };
               setPagination(newPagination);
               await fetchRecords(newPagination);
@@ -362,31 +381,63 @@ export default function BiometricData() {
       </Card>
 
       {/* 新增记录对话框 */}
-      <Dialog visible={visible} onClose={() => setVisible(false)} header="新增体征数据">
+      <Dialog
+        visible={visible}
+        onClose={() => setVisible(false)}
+        header="新增体征数据"
+      >
         <Form onSubmit={handleSubmit}>
           <Form.FormItem label="身高 (cm)">
-            <InputNumber value={formData.heightCm} onChange={(val) => setFormData({ ...formData, heightCm: val })} />
+            <InputNumber
+              value={formData.heightCm}
+              onChange={(val) => setFormData({ ...formData, heightCm: val })}
+            />
           </Form.FormItem>
           <Form.FormItem label="体重 (kg)">
-            <InputNumber value={formData.weightKg} onChange={(val) => setFormData({ ...formData, weightKg: val })} />
+            <InputNumber
+              value={formData.weightKg}
+              onChange={(val) => setFormData({ ...formData, weightKg: val })}
+            />
           </Form.FormItem>
           <Form.FormItem label="收缩压">
-            <InputNumber value={formData.systolicPressure} onChange={(val) => setFormData({ ...formData, systolicPressure: val })} />
+            <InputNumber
+              value={formData.systolicPressure}
+              onChange={(val) =>
+                setFormData({ ...formData, systolicPressure: val })
+              }
+            />
           </Form.FormItem>
           <Form.FormItem label="舒张压">
-            <InputNumber value={formData.diastolicPressure} onChange={(val) => setFormData({ ...formData, diastolicPressure: val })} />
+            <InputNumber
+              value={formData.diastolicPressure}
+              onChange={(val) =>
+                setFormData({ ...formData, diastolicPressure: val })
+              }
+            />
           </Form.FormItem>
           <Form.FormItem label="血糖">
-            <InputNumber value={formData.bloodGlucose} onChange={(val) => setFormData({ ...formData, bloodGlucose: val })} />
+            <InputNumber
+              value={formData.bloodGlucose}
+              onChange={(val) =>
+                setFormData({ ...formData, bloodGlucose: val })
+              }
+            />
           </Form.FormItem>
           <Form.FormItem label="血脂">
-            <InputNumber value={formData.bloodLipid} onChange={(val) => setFormData({ ...formData, bloodLipid: val })} />
+            <InputNumber
+              value={formData.bloodLipid}
+              onChange={(val) => setFormData({ ...formData, bloodLipid: val })}
+            />
           </Form.FormItem>
           <Form.FormItem label="测量时间">
             <DatePicker
               enableTimePicker
               format="YYYY-MM-DD HH:mm:ss"
-              value={formData.measurementTime ? new Date(formData.measurementTime) : undefined}
+              value={
+                formData.measurementTime
+                  ? new Date(formData.measurementTime)
+                  : undefined
+              }
               onChange={(val) => {
                 if (val) {
                   const date = new Date(val);

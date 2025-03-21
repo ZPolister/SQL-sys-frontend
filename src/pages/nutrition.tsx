@@ -1,4 +1,15 @@
-import { Button, Card, Dialog, Form, InputNumber, Table, DatePicker, DateRangePicker, Input, Select } from "tdesign-react";
+import {
+  Button,
+  Card,
+  Dialog,
+  Form,
+  InputNumber,
+  Table,
+  DatePicker,
+  DateRangePicker,
+  Input,
+  Select,
+} from "tdesign-react";
 import { useEffect, useState } from "react";
 import * as echarts from "echarts";
 import { DietLogDto, ResponseResultPageDietLog } from "../api";
@@ -16,23 +27,30 @@ const toDateString = (dt: Date) => {
 export default function Nutrition() {
   const [chartData, setChartData] = useState<any>(null);
   const [records, setRecords] = useState<any[]>([]);
-  const [pagination, setPagination] = useState({ pageNum: 1, pageSize: 10, total: 0 });
+  const [pagination, setPagination] = useState({
+    pageNum: 1,
+    pageSize: 10,
+    total: 0,
+  });
   const [visible, setVisible] = useState(false);
   const [timeRange, setTimeRange] = useState<string>("WEEK");
   // 设置默认时间范围为最近30天
   const [dateRange, setDateRange] = useState<[string, string]>([
     toDateString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
-    toDateString(new Date())
+    toDateString(new Date()),
   ]);
   const [formData, setFormData] = useState<DietLogDto>({
     foodItem: "",
     quantityGrams: 0,
     totalCalories: 0,
-    consumptionTime: new Date().getTime()
+    consumptionTime: new Date().getTime(),
   });
 
   useEffect(() => {
     fetchChartData();
+  }, [timeRange]);
+
+  useEffect(() => {
     fetchRecords();
   }, []);
 
@@ -42,9 +60,9 @@ export default function Nutrition() {
       const handleResize = () => {
         chart?.resize();
       };
-      window.addEventListener('resize', handleResize);
+      window.addEventListener("resize", handleResize);
       return () => {
-        window.removeEventListener('resize', handleResize);
+        window.removeEventListener("resize", handleResize);
         chart?.dispose();
       };
     }
@@ -58,16 +76,19 @@ export default function Nutrition() {
 
   const fetchRecords = async (paginationParams = pagination) => {
     const api = $app.$DefaultApi;
-    const result = await api.getDietPage({
+    const result = (await api.getDietPage({
       startDate: new Date(dateRange[0]),
       endDate: new Date(dateRange[1]),
       pageNum: paginationParams.pageNum,
       pageSize: paginationParams.pageSize,
-    }) as ResponseResultPageDietLog;
+    })) as ResponseResultPageDietLog;
     if (result.code === 200) {
       const resultResponseRecord = result as ResponseResultPageDietLog;
       setRecords(resultResponseRecord.data?.records || []);
-      setPagination({ ...pagination, total: resultResponseRecord.data?.total || 0 });
+      setPagination({
+        ...paginationParams,
+        total: resultResponseRecord.data?.total || 0,
+      });
     }
   };
 
@@ -79,22 +100,22 @@ export default function Nutrition() {
         tooltip: { trigger: "axis" },
         legend: {
           data: ["每日热量"],
-          bottom: 0
+          bottom: 0,
         },
         grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '10%',
-          containLabel: true
+          left: "3%",
+          right: "4%",
+          bottom: "10%",
+          containLabel: true,
         },
         xAxis: {
           type: "category",
           data: chartData.dates,
-          boundaryGap: true
+          boundaryGap: true,
         },
         yAxis: {
-          type: 'value',
-          name: '热量(千卡)',
+          type: "value",
+          name: "热量(千卡)",
         },
         series: [
           {
@@ -103,9 +124,9 @@ export default function Nutrition() {
             type: "bar",
             smooth: true,
             itemStyle: {
-              color: '#91cc75'
-            }
-          }
+              color: "#91cc75",
+            },
+          },
         ],
       };
       myChart.setOption(option);
@@ -141,7 +162,6 @@ export default function Nutrition() {
               variant={timeRange === "WEEK" ? "base" : "outline"}
               onClick={() => {
                 setTimeRange("WEEK");
-                fetchChartData();
               }}
             >
               近一周
@@ -150,7 +170,6 @@ export default function Nutrition() {
               variant={timeRange === "MONTH" ? "base" : "outline"}
               onClick={() => {
                 setTimeRange("MONTH");
-                fetchChartData();
               }}
             >
               近一月
@@ -159,7 +178,6 @@ export default function Nutrition() {
               variant={timeRange === "THREE_MONTHS" ? "base" : "outline"}
               onClick={() => {
                 setTimeRange("THREE_MONTHS");
-                fetchChartData();
               }}
             >
               近三月
@@ -168,7 +186,6 @@ export default function Nutrition() {
               variant={timeRange === "HALF_YEAR" ? "base" : "outline"}
               onClick={() => {
                 setTimeRange("HALF_YEAR");
-                fetchChartData();
               }}
             >
               近半年
@@ -184,70 +201,74 @@ export default function Nutrition() {
         <div className="mb-4 flex justify-between items-center">
           <div className="flex gap-4 items-center">
             <DateRangePicker
-              placeholder={['开始时间', '结束时间']}
+              placeholder={["开始时间", "结束时间"]}
               value={dateRange}
               onChange={(val) => {
                 if (Array.isArray(val) && val[0] && val[1]) {
                   setDateRange([
                     toDateString(new Date(val[0])),
-                    toDateString(new Date(val[1]))
+                    toDateString(new Date(val[1])),
                   ]);
                   fetchRecords();
                 }
               }}
             />
           </div>
-          <Button theme="primary" onClick={() => setVisible(true)}>新增记录</Button>
+          <Button theme="primary" onClick={() => setVisible(true)}>
+            新增记录
+          </Button>
         </div>
         <Table
           data={records}
           columns={[
             {
-              align: 'center',
+              align: "center",
               width: 150,
               ellipsis: true,
               title: "食物名称",
               colKey: "foodItem",
             },
             {
-              align: 'center',
+              align: "center",
               width: 100,
               ellipsis: true,
               title: "数量",
               colKey: "quantityGrams",
-              cell: ({ row }) => `${row.quantityGrams} 克`
+              cell: ({ row }) => `${row.quantityGrams} 克`,
             },
             {
-              align: 'center',
+              align: "center",
               width: 100,
               ellipsis: true,
               title: "热量",
               colKey: "totalCalories",
-              cell: ({ row }) => `${row.totalCalories} 千卡`
+              cell: ({ row }) => `${row.totalCalories} 千卡`,
             },
             {
-              align: 'center',
+              align: "center",
               width: 160,
               ellipsis: true,
               title: "食用时间",
               colKey: "consumptionTime",
               cell: ({ row }) => {
-                const date = row.consumptionTime ? new Date(row.consumptionTime) : null;
-                return date?.toLocaleString('zh-CN', {
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit',
-                  hour12: false
+                const date = row.consumptionTime
+                  ? new Date(row.consumptionTime)
+                  : null;
+                return date?.toLocaleString("zh-CN", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                  hour12: false,
                 });
-              }
+              },
             },
             {
-              align: 'center',
+              align: "center",
               width: 100,
-              fixed: 'right',
+              fixed: "right",
               title: "操作",
               colKey: "action",
               cell: ({ row }) => (
@@ -275,7 +296,11 @@ export default function Nutrition() {
             showJumper: true,
             pageSizeOptions: [5, 10, 20, 50],
             onPageSizeChange: (size) => {
-              const newPagination = { ...pagination, pageSize: size, pageNum: 1 };
+              const newPagination = {
+                ...pagination,
+                pageSize: size,
+                pageNum: 1,
+              };
               setPagination(newPagination);
               fetchRecords(newPagination);
             },
@@ -283,7 +308,7 @@ export default function Nutrition() {
               const newPagination = {
                 ...pagination,
                 pageNum: pageInfo.current,
-                pageSize: pageInfo.pageSize
+                pageSize: pageInfo.pageSize,
               };
               setPagination(newPagination);
               await fetchRecords(newPagination);
@@ -293,7 +318,11 @@ export default function Nutrition() {
       </Card>
 
       {/* 新增记录对话框 */}
-      <Dialog visible={visible} onClose={() => setVisible(false)} header="新增饮食记录">
+      <Dialog
+        visible={visible}
+        onClose={() => setVisible(false)}
+        header="新增饮食记录"
+      >
         <Form onSubmit={handleSubmit}>
           <Form.FormItem label="食物名称">
             <Input
@@ -302,16 +331,30 @@ export default function Nutrition() {
             />
           </Form.FormItem>
           <Form.FormItem label="数量 (克)">
-            <InputNumber value={formData.quantityGrams} onChange={(val) => setFormData({ ...formData, quantityGrams: val })} />
+            <InputNumber
+              value={formData.quantityGrams}
+              onChange={(val) =>
+                setFormData({ ...formData, quantityGrams: val })
+              }
+            />
           </Form.FormItem>
           <Form.FormItem label="热量 (千卡)">
-            <InputNumber value={formData.totalCalories} onChange={(val) => setFormData({ ...formData, totalCalories: val })} />
+            <InputNumber
+              value={formData.totalCalories}
+              onChange={(val) =>
+                setFormData({ ...formData, totalCalories: val })
+              }
+            />
           </Form.FormItem>
           <Form.FormItem label="食用时间">
             <DatePicker
               enableTimePicker
               format="YYYY-MM-DD HH:mm:ss"
-              value={formData.consumptionTime ? new Date(formData.consumptionTime) : undefined}
+              value={
+                formData.consumptionTime
+                  ? new Date(formData.consumptionTime)
+                  : undefined
+              }
               onChange={(val) => {
                 if (val) {
                   const date = new Date(val);
