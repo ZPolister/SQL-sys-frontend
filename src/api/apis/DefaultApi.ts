@@ -179,15 +179,15 @@ export interface GetHealthCheckReminderListRequest {
 }
 
 export interface GetHealthRecordsRequest {
-    startTime?: Date;
-    endTime?: Date;
+    startTime?: string;
+    endTime?: string;    
     pageNum?: number;
     pageSize?: number;
 }
 
 export interface GetMedicationReminderRequest {
-    startDate?: Date;
-    endDate?: Date;
+    startDate?: string;
+    endDate?: string;
     pageNum?: number;
     pageSize?: number;
 }
@@ -197,8 +197,8 @@ export interface GetSleepDurationRequest {
 }
 
 export interface GetSleepPageRequest {
-    startDate?: Date;
-    endDate?: Date;
+    startDate?: string;
+    endDate?: string;
     pageNum?: number;
     pageSize?: number;
 }
@@ -1200,11 +1200,11 @@ export class DefaultApi extends runtime.BaseAPI {
         const queryParameters: any = {};
 
         if (requestParameters['startTime'] != null) {
-            queryParameters['startTime'] = (requestParameters['startTime'] as any).toISOString();
+            queryParameters['startTime'] = (requestParameters['startTime'] as any);
         }
 
         if (requestParameters['endTime'] != null) {
-            queryParameters['endTime'] = (requestParameters['endTime'] as any).toISOString();
+            queryParameters['endTime'] = (requestParameters['endTime'] as any);
         }
 
         if (requestParameters['pageNum'] != null) {

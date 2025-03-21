@@ -4,6 +4,16 @@ import * as echarts from "echarts";
 import {BiometricRecordDto, BiometricRecordVo, ResponseResultPageBiometricRecordVo} from "../api";
 import { $app } from "../app/app";
 
+
+const toDateString = (dt: Date) => {
+  // 获取时间信息
+const year = dt.getFullYear() // 2021
+const month = dt.getMonth() // 8
+const date = dt.getDate() // 23
+// 拼接成字符串
+return `${year}-${month + 1}-${date}`
+};
+
 export default function BiometricData() {
   const [chartData, setChartData] = useState<any>(null);
   const [records, setRecords] = useState<BiometricRecordVo[]>([]);
@@ -11,9 +21,9 @@ export default function BiometricData() {
   const [visible, setVisible] = useState(false);
   const [timeRange, setTimeRange] = useState<string>("7d");
   // 设置默认时间范围为最近30天
-  const [dateRange, setDateRange] = useState<[Date, Date]>([
-    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-    new Date()
+  const [dateRange, setDateRange] = useState<[string, string]>([
+    toDateString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
+    toDateString(new Date())
   ]);
   const [formData, setFormData] = useState<BiometricRecordDto>({
     heightCm: 0,
@@ -22,7 +32,7 @@ export default function BiometricData() {
     diastolicPressure: 0,
     bloodGlucose: 0,
     bloodLipid: 0,
-    measurementTime: "",
+    measurementTime: new Date(),
   });
 
   useEffect(() => {
@@ -44,6 +54,8 @@ export default function BiometricData() {
     }
   }, [chartData]);
 
+
+
   const fetchChartData = async () => {
     const api = $app.$DefaultApi;
     const result = await api.getHealthChart({ timeRange });
@@ -55,15 +67,16 @@ export default function BiometricData() {
     // 使用 Date 对象作为参数
     const result = await api.getHealthRecords({
       startTime: dateRange[0] ?
-        new Date(dateRange[0].getFullYear(), dateRange[0].getMonth(), dateRange[0].getDate()) : undefined,
+        dateRange[0] : undefined,
       endTime: dateRange[1] ?
-        new Date(dateRange[1].getFullYear(), dateRange[1].getMonth(), dateRange[1].getDate(), 23, 59, 59) : undefined,
+        dateRange[1] : undefined,
       pageNum: pagination.pageNum,
       pageSize: pagination.pageSize,
     });
     if (result.code === 200) {
-      setRecords(result.data.records);
-      setPagination({ ...pagination, total: result.data.total });
+      const resultResponseRecord = result as ResponseResultPageBiometricRecordVo;
+      setRecords(resultResponseRecord.data?.records || []);
+      setPagination({ ...pagination, total: resultResponseRecord.data?.total || 0 });
     }
   };
 
@@ -225,8 +238,8 @@ export default function BiometricData() {
               onChange={(val) => {
                 if (Array.isArray(val) && val[0] && val[1]) {
                   setDateRange([
-                    new Date(val[0]),
-                    new Date(val[1])
+                    toDateString(new Date(val[0])),
+                    toDateString(new Date(val[1]))
                   ]);
                   fetchRecords();
                 }
@@ -293,8 +306,8 @@ export default function BiometricData() {
               title: "测量时间",
               colKey: "measurementTime",
               cell: ({ row }) => {
-                const date = new Date(row.measurementTime);
-                return date.toLocaleString('zh-CN', {
+                const date = row.measurementTime;
+                return date?.toLocaleString('zh-CN', {
                   year: 'numeric',
                   month: '2-digit',
                   day: '2-digit',
@@ -316,7 +329,7 @@ export default function BiometricData() {
                   theme="danger"
                   variant="text"
                   size="small"
-                  onClick={() => handleDelete(row.id)}
+                  onClick={() => handleDelete(row.recordId)}
                 >
                   删除
                 </Button>
@@ -381,7 +394,7 @@ export default function BiometricData() {
               onChange={(val) => {
                 if (val) {
                   const date = new Date(val);
-                  setFormData({ ...formData, measurementTime: date.toISOString() });
+                  setFormData({ ...formData, measurementTime: date.getTime() });
                 }
               }}
             />

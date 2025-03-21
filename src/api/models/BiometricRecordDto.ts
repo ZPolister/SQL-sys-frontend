@@ -57,10 +57,10 @@ export interface BiometricRecordDto {
     bloodLipid?: number;
     /**
      * 测量时间
-     * @type {Date}
+     * @type {number}
      * @memberof BiometricRecordDto
      */
-    measurementTime?: Date;
+    measurementTime?: number;
 }
 
 /**
@@ -107,7 +107,7 @@ export function BiometricRecordDtoToJSONTyped(value?: BiometricRecordDto | null,
         'diastolicPressure': value['diastolicPressure'],
         'bloodGlucose': value['bloodGlucose'],
         'bloodLipid': value['bloodLipid'],
-        'measurementTime': value['measurementTime'] == null ? undefined : ((value['measurementTime']).toISOString()),
+        'measurementTime': value['measurementTime'] == null ? undefined : ((value['measurementTime'])),
     };
 }
 

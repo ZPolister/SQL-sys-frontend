@@ -124,8 +124,8 @@ export default function Overview() {
         )}
       >
         {biometricData && (
-          <div className={"w-full flex flex-col gap-6 p-4"}>
-            <Row gutter={[16, 16]} className="mb-4">
+    <div className={"w-full flex flex-col gap-4 p-4"}>
+      <Row gutter={[16, 16]} className="">
         <Col span={6}>
           <Statistic title="身高" value={biometricData.heightCm} unit="cm" />
         </Col>
@@ -133,10 +133,11 @@ export default function Overview() {
           <Statistic title="体重" value={biometricData.weightKg} unit="kg" />
         </Col>
       </Row>
+
       <Row gutter={[16, 16]}>
         <Col span={6}>
           <Statistic title="BMI" value={biometricData.bmi?.toFixed(1)} />
-          <Tag theme={biometricData.bmiLevel === "正常" ? "success" : "warning"} className="mt-4">
+          <Tag theme={biometricData.bmiLevel === "正常" ? "success" : "warning"} className="ml-2 mt-2">
             {biometricData.bmiLevel}
           </Tag>
         </Col>
@@ -146,19 +147,19 @@ export default function Overview() {
                   value={`${biometricData.systolicPressure}/${biometricData.diastolicPressure}`}
                   unit="mmHg"
                 />
-                <Tag theme={biometricData.bloodPressureLevel === "正常" ? "success" : "warning"} className="mt-4">
+                <Tag theme={biometricData.bloodPressureLevel === "正常" ? "success" : "warning"} className="ml-2 mt-2">
                   {biometricData.bloodPressureLevel}
                 </Tag>
               </Col>
               <Col span={6}>
                 <Statistic title="血糖" value={biometricData.bloodGlucose} unit="mmol/L" />
-                <Tag theme={biometricData.bloodGlucoseLevel === "正常" ? "success" : "warning"} className="mt-4">
+                <Tag theme={biometricData.bloodGlucoseLevel === "正常" ? "success" : "warning"} className="ml-2 mt-2">
                   {biometricData.bloodGlucoseLevel}
                 </Tag>
               </Col>
               <Col span={6}>
                 <Statistic title="血脂" value={biometricData.bloodLipid} unit="mmol/L" />
-                <Tag theme={biometricData.bloodLipidLevel === "正常" ? "success" : "warning"} className="mt-4">
+                <Tag theme={biometricData.bloodLipidLevel === "正常" ? "success" : "warning"} className="ml-2 mt-2">
                   {biometricData.bloodLipidLevel}
                 </Tag>
               </Col>
@@ -214,19 +215,20 @@ export default function Overview() {
         )}
       >
         {sleepData && (
-          <div className={"w-full flex flex-row items-center justify-between p-4"}>
+          <div className={"text-xl w-full flex flex-row items-center justify-between p-8"}>
             <div>
-              <div className="text-sm text-gray-500 mb-1">入睡时间</div>
+              <div className="text-gray-500 mb-1">入睡时间</div>
               <div>{new Date(sleepData.sleepStart).toLocaleString()}</div>
             </div>
             <div>
-              <div className="text-sm text-gray-500 mb-1">醒来时间</div>
+              <div className="text-gray-500 mb-1">醒来时间</div>
               <div>{new Date(sleepData.sleepEnd).toLocaleString()}</div>
             </div>
             <Statistic
               title="睡眠质量"
               value={sleepData.sleepQuality}
               suffix={`/5`}
+              className="text-l"
             />
           </div>
         )}
