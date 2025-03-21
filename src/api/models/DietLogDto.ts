@@ -39,10 +39,10 @@ export interface DietLogDto {
     totalCalories: number;
     /**
      * 时间戳格式
-     * @type {Date}
+     * @type {number}
      * @memberof DietLogDto
      */
-    consumptionTime?: Date;
+    consumptionTime?: number;
 }
 
 /**

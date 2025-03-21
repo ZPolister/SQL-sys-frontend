@@ -1,4 +1,4 @@
-import { Button, Card, Dialog, Form, InputNumber, Pagination, Table, DatePicker, DateRangePicker } from "tdesign-react";
+import { Button, Card, Dialog, Form, InputNumber, Table, DatePicker, DateRangePicker } from "tdesign-react";
 import { useEffect, useState } from "react";
 import * as echarts from "echarts";
 import {BiometricRecordDto, BiometricRecordVo, ResponseResultPageBiometricRecordVo} from "../api";
@@ -32,7 +32,7 @@ export default function BiometricData() {
     diastolicPressure: 0,
     bloodGlucose: 0,
     bloodLipid: 0,
-    measurementTime: new Date(),
+    measurementTime: new Date().getTime(),
   });
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function BiometricData() {
     if (result.code === 200) setChartData(result.data);
   };
 
-  const fetchRecords = async () => {
+  const fetchRecords = async (paginationParams = pagination) => {
     const api = $app.$DefaultApi;
     // 使用 Date 对象作为参数
     const result = await api.getHealthRecords({
@@ -70,8 +70,8 @@ export default function BiometricData() {
         dateRange[0] : undefined,
       endTime: dateRange[1] ?
         dateRange[1] : undefined,
-      pageNum: pagination.pageNum,
-      pageSize: pagination.pageSize,
+      pageNum: paginationParams.pageNum,
+      pageSize: paginationParams.pageSize,
     });
     if (result.code === 200) {
       const resultResponseRecord = result as ResponseResultPageBiometricRecordVo;
@@ -347,11 +347,7 @@ export default function BiometricData() {
             current: pagination.pageNum,
             pageSize: pagination.pageSize,
             showJumper: true,
-            pageSizeOptions: [10, 20, 50],
-            onPageSizeChange: (size) => {
-              setPagination(prev => ({ ...prev, pageSize: size, pageNum: 1 }));
-              fetchRecords();
-            },
+            pageSizeOptions: [5, 10, 20, 50],
             onChange: async (pageInfo) => {
               const newPagination = {
                 ...pagination,
@@ -359,7 +355,7 @@ export default function BiometricData() {
                 pageSize: pageInfo.pageSize
               };
               setPagination(newPagination);
-              await fetchRecords();
+              await fetchRecords(newPagination);
             },
           }}
         />
