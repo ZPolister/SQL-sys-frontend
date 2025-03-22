@@ -18,6 +18,7 @@ import Nutrition from "./pages/nutrition";
 import {$app} from "./app/app";
 import useLoginVM from "./hooks/useLoginVM";
 import Login from "./pages/Login";
+import Goal from "./pages/goal";
 
 const {HeadMenu, MenuItem} = Menu;
 const {Header, Content, Footer, Aside} = Layout;
@@ -54,6 +55,11 @@ function SideMenu({selected, onSelected}: SideMenuProps) {
       value: "sleep",
       icon: <SleepIcon/>,
       label: "睡眠数据"
+    },
+    {
+      value: "goal",
+      icon: <SleepIcon/>,
+      label: "健康分析与目标"
     }
   ];
 
@@ -96,6 +102,8 @@ const App: React.FC = () => {
         return <Nutrition/>;
       case 'sleep':
         return <Sleep/>;
+      case 'goal':
+        return <Goal/>;
       default:
         return <div>内容加载中...</div>;
     }
