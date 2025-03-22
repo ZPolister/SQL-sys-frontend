@@ -43,39 +43,88 @@ export default function Goal() {
 
   const fetchAnalysis = async () => {
     const api = $app.$DefaultApi;
+    const decoder = new TextDecoder(); // 初始化解码器
+    let buffer = ''; // 用于缓存未解析的数据
+
     try {
       const response = await api.getAnalysisStream() as Response;
-      console.log("获取分析流式响应:", response, response instanceof ReadableStream);
+      if (!response.body) {
+        throw new Error("响应体为空");
+      }
 
-      if (response.body instanceof ReadableStream) {
-        const reader = response.body.getReader();
-        while (true) {
-          const {done, value} = await reader.read();
-          if (done) break;
+      const reader = response.body.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break; // 流结束
 
-          const text = decoder.decode(value);
-          console.log("得到文本:", text);
+        // 解码数据块并追加到缓存中
+        buffer += decoder.decode(value, { stream: true });
 
-          analysisText.current += text;
+        // 解析缓存中的数据，去除 `data:` 前缀和换行符
+        const { parsedText, remainingBuffer } = parseBuffer(buffer);
+        buffer = remainingBuffer; // 更新缓存
 
-          // 查找并解析目标建议
-          const goalMatch = analysisText.current.match(/<goal>(.*?)<\/goal>/);
-          if (goalMatch) {
-            try {
-              const goalData = JSON.parse(goalMatch[1]);
-              console.log("目标建议:", goalData);
-              setGoalSuggestion(goalData);
-            } catch (e) {
-              console.error("解析目标建议失败:", e);
-            }
-          }
-
-          // 将文本按行分割并更新状态
-          setAnalysis(analysisText.current.split("\n").filter(line => line.trim()));
+        // 更新状态
+        if (parsedText) {
+          analysisText.current += parsedText;
+          updateAnalysis(analysisText.current);
         }
+
+        // 查找并解析目标建议
+        parseGoal(analysisText.current);
       }
     } catch (error) {
       console.error("获取分析失败:", error);
+    }
+  };
+
+  /**
+   * 解析缓存中的数据，去除 `data:` 前缀和换行符
+   * @param {string} buffer - 缓存数据
+   * @returns {Object} - { parsedText: string, remainingBuffer: string }
+   */
+  const parseBuffer = (buffer) => {
+    // 按换行符分割数据块
+    const lines = buffer.split("\n");
+
+    // 解析每行数据，去除 `data:` 前缀
+    const parsedLines = lines
+      .map(line => line.trim()) // 去除空白字符
+      .filter(line => line.startsWith("data:")) // 过滤以 `data:` 开头的行
+      .map(line => line.slice(5).trim()); // 去除 `data:` 前缀并去除空白字符
+
+    // 将解析后的行合并为文本
+    const parsedText = parsedLines.join("\n");
+
+    // 保留未解析的部分（最后一行的未完成数据）
+    const remainingBuffer = lines[lines.length - 1].startsWith("data:") ? '' : lines[lines.length - 1];
+
+    return { parsedText, remainingBuffer };
+  };
+
+  /**
+   * 更新分析结果状态
+   * @param {string} text - 待更新的文本
+   */
+  const updateAnalysis = (text) => {
+    const lines = text.split("\n").filter(line => line.trim());
+    setAnalysis(lines); // 更新状态
+  };
+
+  /**
+   * 解析目标建议并更新状态
+   * @param {string} text - 待解析的文本
+   */
+  const parseGoal = (text) => {
+    const goalMatch = text.match(/<goal>(.*?)<\/goal>/);
+    if (goalMatch) {
+      try {
+        const goalData = JSON.parse(goalMatch[1]);
+        console.log("目标建议:", goalData);
+        setGoalSuggestion(goalData);
+      } catch (e) {
+        console.error("解析目标建议失败:", e);
+      }
     }
   };
 
