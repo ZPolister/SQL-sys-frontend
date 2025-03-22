@@ -24,9 +24,18 @@ export default function Goal() {
   const decoder = new TextDecoder();
   const analysisText = useRef("");
 
+  const abortController = useRef<any>(new AbortController());
+
   useEffect(() => {
-    fetchCurrentGoal();
-    fetchAnalysis();
+    abortController.current = new AbortController();
+    fetchCurrentGoal().finally();
+    fetchAnalysis().finally();
+
+    return () => {
+      console.log("组件卸载")
+      abortController.current.abort();
+      abortController.current = null;
+    }
   }, []);
 
   const fetchCurrentGoal = async () => {
@@ -42,6 +51,9 @@ export default function Goal() {
   };
 
   const fetchAnalysis = async () => {
+    console.log("发起请求")
+    const currentFetchController = abortController.current;
+
     const api = $app.$DefaultApi;
     const decoder = new TextDecoder(); // 初始化解码器
     let buffer = ''; // 用于缓存未解析的数据
@@ -53,16 +65,28 @@ export default function Goal() {
       }
 
       const reader = response.body.getReader();
+
+      analysisText.current = '';
+
       while (true) {
-        const { done, value } = await reader.read();
+        // 检查是否被取消
+        if (currentFetchController.signal.aborted) {
+          console.log("取消请求")
+          await reader.cancel()
+          return;
+        }
+
+        const {done, value} = await reader.read();
         if (done) break; // 流结束
 
         // 解码数据块并追加到缓存中
-        buffer += decoder.decode(value, { stream: true });
+        buffer += decoder.decode(value, {stream: true});
 
         // 解析缓存中的数据，去除 `data:` 前缀和换行符
-        const { parsedText, remainingBuffer } = parseBuffer(buffer);
+        const {parsedText, remainingBuffer} = parseBuffer(buffer);
         buffer = remainingBuffer; // 更新缓存
+
+        // console.log("text", parsedText)
 
         // 更新状态
         if (parsedText) {
@@ -99,7 +123,7 @@ export default function Goal() {
     // 保留未解析的部分（最后一行的未完成数据）
     const remainingBuffer = lines[lines.length - 1].startsWith("data:") ? '' : lines[lines.length - 1];
 
-    return { parsedText, remainingBuffer };
+    return {parsedText, remainingBuffer};
   };
 
   /**
