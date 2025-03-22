@@ -25,8 +25,8 @@ export class HealthApp extends EventTarget {
           },
           post(context: ResponseContext): Promise<Response | void> {
             return new Promise(async (resolve, reject) => {
-              const res = context.response.clone()
-              console.log(`[HealthApp] 响应 ${context.url}`, await res.json())
+              // const res = context.response.clone()
+              // console.log(`[HealthApp] 响应 ${context.url}`, await res.json())
               resolve(context.response);
             })
           }

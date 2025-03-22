@@ -1,7 +1,7 @@
-import { useEffect, useState, useRef } from "react";
-import { Card, Progress, Button, Dialog, Form, InputNumber, DatePicker } from "tdesign-react";
-import { $app } from "../app/app";
-import { HealthGoalDto, ResponseResultHealthGoal } from "../api";
+import {useEffect, useRef, useState} from "react";
+import {Button, Card, DatePicker, Dialog, Form, InputNumber, Progress} from "tdesign-react";
+import {$app} from "../app/app";
+import {HealthGoalDto, ResponseResultHealthGoal} from "../api";
 
 interface GoalSuggestion {
   goalCategory: "WEIGHT_LOSS" | "BLOOD_SUGAR" | "BLOOD_LIPID" | "EXERCISE_CALORIES";
@@ -44,14 +44,18 @@ export default function Goal() {
   const fetchAnalysis = async () => {
     const api = $app.$DefaultApi;
     try {
-      const response = await api.getAnalysisStream();
-      if (response instanceof ReadableStream) {
-        const reader = response.getReader();
+      const response = await api.getAnalysisStream() as Response;
+      console.log("获取分析流式响应:", response, response instanceof ReadableStream);
+
+      if (response.body instanceof ReadableStream) {
+        const reader = response.body.getReader();
         while (true) {
-          const { done, value } = await reader.read();
+          const {done, value} = await reader.read();
           if (done) break;
 
           const text = decoder.decode(value);
+          console.log("得到文本:", text);
+
           analysisText.current += text;
 
           // 查找并解析目标建议
@@ -59,6 +63,7 @@ export default function Goal() {
           if (goalMatch) {
             try {
               const goalData = JSON.parse(goalMatch[1]);
+              console.log("目标建议:", goalData);
               setGoalSuggestion(goalData);
             } catch (e) {
               console.error("解析目标建议失败:", e);
@@ -209,7 +214,7 @@ export default function Goal() {
             <select
               className="w-full px-4 py-2 border rounded"
               value={formData.goalCategory}
-              onChange={(e) => setFormData({ ...formData, goalCategory: e.target.value })}
+              onChange={(e) => setFormData({...formData, goalCategory: e.target.value})}
             >
               <option value="WEIGHT_LOSS">减重目标</option>
               <option value="BLOOD_SUGAR">血糖控制</option>
@@ -220,7 +225,7 @@ export default function Goal() {
           <Form.FormItem label="目标值">
             <InputNumber
               value={formData.targetValue}
-              onChange={(val) => setFormData({ ...formData, targetValue: val })}
+              onChange={(val) => setFormData({...formData, targetValue: val})}
             />
           </Form.FormItem>
           <Form.FormItem label="目标日期">
@@ -228,7 +233,7 @@ export default function Goal() {
               value={formData.targetDate}
               onChange={(val) => {
                 if (val) {
-                  setFormData({ ...formData, targetDate: new Date(val) });
+                  setFormData({...formData, targetDate: new Date(val)});
                 }
               }}
             />
