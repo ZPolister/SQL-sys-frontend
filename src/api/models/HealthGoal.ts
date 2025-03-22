@@ -98,7 +98,7 @@ export function HealthGoalFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'targetValue': json['targetValue'] == null ? undefined : json['targetValue'],
         'currentValue': json['currentValue'] == null ? undefined : json['currentValue'],
         'startDate': json['startDate'] == null ? undefined : (new Date(json['startDate'])),
-        'targetDate': json['targetDate'] == null ? undefined : json['targetDate']),
+        'targetDate': json['targetDate'] == null ? undefined : json['targetDate'],
         'goalStatus': json['goalStatus'] == null ? undefined : json['goalStatus'],
         'createdAt': json['createdAt'] == null ? undefined : (new Date(json['createdAt'])),
     };
