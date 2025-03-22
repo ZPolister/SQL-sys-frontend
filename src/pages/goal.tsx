@@ -59,7 +59,11 @@ export default function Goal() {
     let buffer = ''; // 用于缓存未解析的数据
 
     try {
-      const response = await api.getAnalysisStream() as Response;
+      const response = await api.getAnalysisStream(
+        {},
+        {signal: abortController.current.signal}
+      ) as Response;
+
       if (!response.body) {
         throw new Error("响应体为空");
       }
