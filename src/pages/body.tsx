@@ -1,11 +1,7 @@
 import {
   Button,
   Card,
-  Dialog,
-  Form,
-  InputNumber,
   Table,
-  DatePicker,
   DateRangePicker,
 } from "tdesign-react";
 import { useEffect, useState } from "react";
@@ -16,7 +12,7 @@ import {
   ResponseResultPageBiometricRecordVo,
 } from "../api";
 import { $app } from "../app/app";
-import { MessagePlugin } from "tdesign-react";
+import BiometricDialog from "./components/Dialogs/BiometricDialog";
 
 const toDateString = (dt: Date) => {
   // 获取时间信息
@@ -190,24 +186,9 @@ export default function BiometricData() {
     if (result.code === 200) await fetchRecords();
   };
 
-  const handleSubmit = async () => {
-    const api = $app.$DefaultApi;
-    try {
-      const result = await api.postHealthBiometric({
-        biometricRecordDto: formData,
-      });
-      if (result.code === 200) {
-        await MessagePlugin.success(result.msg || "添加体征数据成功");
-        setVisible(false);
-        await fetchRecords();
-        await fetchChartData();
-      } else {
-        await MessagePlugin.error(result.msg || "添加体征数据失败");
-      }
-    } catch (error) {
-      await MessagePlugin.error("添加体征数据失败，请检查网络连接");
-      console.error(error);
-    }
+  const handleSuccess = async () => {
+    await fetchRecords();
+    await fetchChartData();
   };
 
   return (
@@ -390,76 +371,12 @@ export default function BiometricData() {
         />
       </Card>
 
-      {/* 新增记录对话框 */}
-      <Dialog
+      {/* 使用解耦的体征数据对话框组件 */}
+      <BiometricDialog
         visible={visible}
         onClose={() => setVisible(false)}
-        header="新增体征数据"
-        confirmBtn="提交"
-        onConfirm={handleSubmit}
-      >
-        <Form>
-          <Form.FormItem label="身高 (cm)">
-            <InputNumber
-              value={formData.heightCm}
-              onChange={(val) => setFormData({ ...formData, heightCm: val })}
-            />
-          </Form.FormItem>
-          <Form.FormItem label="体重 (kg)">
-            <InputNumber
-              value={formData.weightKg}
-              onChange={(val) => setFormData({ ...formData, weightKg: val })}
-            />
-          </Form.FormItem>
-          <Form.FormItem label="收缩压">
-            <InputNumber
-              value={formData.systolicPressure}
-              onChange={(val) =>
-                setFormData({ ...formData, systolicPressure: val })
-              }
-            />
-          </Form.FormItem>
-          <Form.FormItem label="舒张压">
-            <InputNumber
-              value={formData.diastolicPressure}
-              onChange={(val) =>
-                setFormData({ ...formData, diastolicPressure: val })
-              }
-            />
-          </Form.FormItem>
-          <Form.FormItem label="血糖">
-            <InputNumber
-              value={formData.bloodGlucose}
-              onChange={(val) =>
-                setFormData({ ...formData, bloodGlucose: val })
-              }
-            />
-          </Form.FormItem>
-          <Form.FormItem label="血脂">
-            <InputNumber
-              value={formData.bloodLipid}
-              onChange={(val) => setFormData({ ...formData, bloodLipid: val })}
-            />
-          </Form.FormItem>
-          <Form.FormItem label="测量时间">
-            <DatePicker
-              enableTimePicker
-              format="YYYY-MM-DD HH:mm:ss"
-              value={
-                formData.measurementTime
-                  ? new Date(formData.measurementTime)
-                  : undefined
-              }
-              onChange={(val) => {
-                if (val) {
-                  const date = new Date(val);
-                  setFormData({ ...formData, measurementTime: date.getTime() });
-                }
-              }}
-            />
-          </Form.FormItem>
-        </Form>
-      </Dialog>
+        onSuccess={handleSuccess}
+      />
     </div>
   );
 }

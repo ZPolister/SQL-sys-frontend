@@ -1,6 +1,10 @@
 import {Button, Card, Row, Col, Tag, Statistic} from "tdesign-react";
 import {AddIcon} from "tdesign-icons-react";
 import {useEffect, useState} from "react";
+import BiometricDialog from "./components/Dialogs/BiometricDialog";
+import DietDialog from "./components/Dialogs/DietDialog";
+import ExerciseDialog from "./components/Dialogs/ExerciseDialog";
+import SleepDialog from "./components/Dialogs/SleepDialog";
 import {
     BiometricRecordDto,
     ExerciseLogDto,
@@ -30,6 +34,12 @@ const DataCard = ({title}: { title: string }) => {
 }
 
 export default function Overview() {
+  // 对话框显示状态
+  const [showBiometricDialog, setShowBiometricDialog] = useState(false);
+  const [showExerciseDialog, setShowExerciseDialog] = useState(false);
+  const [showDietDialog, setShowDietDialog] = useState(false);
+  const [showSleepDialog, setShowSleepDialog] = useState(false);
+
   const [biometricData, setBiometricData] = useState<BiometricRecordVo | null>(null);
   const [exerciseData, setExerciseData] = useState<ExerciseLogDto | null>(null);
   const [dietCalories, setDietCalories] = useState<number>(0);
@@ -108,7 +118,6 @@ export default function Overview() {
         console.error('Failed to fetch overview data:', error);
       }
     };
-
     fetchData();
   }, []);
 
@@ -118,7 +127,7 @@ export default function Overview() {
       <Card
         title={"体征数据"}
         actions={(
-          <Button theme="primary" variant="text" icon={<AddIcon/>}>
+          <Button theme="primary" variant="text" icon={<AddIcon/>} onClick={() => setShowBiometricDialog(true)}>
             添加记录
           </Button>
         )}
@@ -176,7 +185,7 @@ export default function Overview() {
       <Card
         title={"运动数据"}
         actions={(
-          <Button theme="primary" variant="text" icon={<AddIcon/>}>
+          <Button theme="primary" variant="text" icon={<AddIcon/>} onClick={() => setShowExerciseDialog(true)}>
             添加记录
           </Button>
         )}
@@ -196,7 +205,7 @@ export default function Overview() {
       <Card
         title={"饮食数据"}
         actions={(
-          <Button theme="primary" variant="text" icon={<AddIcon/>}>
+          <Button theme="primary" variant="text" icon={<AddIcon/>} onClick={() => setShowDietDialog(true)}>
             添加记录
           </Button>
         )}
@@ -209,7 +218,7 @@ export default function Overview() {
       <Card
         title={"睡眠数据"}
         actions={(
-          <Button theme="primary" variant="text" icon={<AddIcon/>}>
+          <Button theme="primary" variant="text" icon={<AddIcon/>} onClick={() => setShowSleepDialog(true)}>
             添加记录
           </Button>
         )}
@@ -302,6 +311,61 @@ export default function Overview() {
         </div>
       </Card>
 
+      {/* 对话框组件 */}
+      <BiometricDialog
+        visible={showBiometricDialog}
+        onClose={() => setShowBiometricDialog(false)}
+        onSuccess={() => {
+          // 刷新数据
+          $app.$DefaultApi.getHealthLatest().then((res: any) => {
+            if (res.code === 200 && res.data) {
+              setBiometricData(res.data);
+            }
+          });
+        }}
+      />
+
+      <ExerciseDialog
+        visible={showExerciseDialog}
+        onClose={() => setShowExerciseDialog(false)}
+        onSuccess={() => {
+          setShowExerciseDialog(false);
+          // 刷新数据
+          $app.$DefaultApi.getExerciseLatest().then((res: any) => {
+            if (res.code === 200 && res.data) {
+              setExerciseData(res.data);
+            }
+          });
+        }}
+      />
+
+      <DietDialog
+        visible={showDietDialog}
+        onClose={() => setShowDietDialog(false)}
+        onSuccess={() => {
+          setShowDietDialog(false);
+          // 刷新数据
+          $app.$DefaultApi.getDietHotToday().then((res: any) => {
+            if (res.code === 200 && res.data !== undefined) {
+              setDietCalories(res.data);
+            }
+          });
+        }}
+      />
+
+      <SleepDialog
+        visible={showSleepDialog}
+        onClose={() => setShowSleepDialog(false)}
+        onSuccess={() => {
+          setShowSleepDialog(false);
+          // 刷新数据
+          $app.$DefaultApi.getSleepLatest().then((res: any) => {
+            if (res.code === 200 && res.data) {
+              setSleepData(res.data);
+            }
+          });
+        }}
+      />
     </div>
   )
 }

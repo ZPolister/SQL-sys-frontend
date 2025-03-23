@@ -1,10 +1,7 @@
 import {
   Button,
   Card,
-  Dialog,
-  Form,
   Table,
-  DatePicker,
   DateRangePicker,
   Select,
 } from "tdesign-react";
@@ -13,6 +10,7 @@ import * as echarts from "echarts";
 import { SleepLogDto, ResponseResultPageSleepLog } from "../api";
 import { $app } from "../app/app";
 import { MessagePlugin } from "tdesign-react";
+import SleepDialog from "./components/Dialogs/SleepDialog";
 
 const toDateString = (dt: Date) => {
   // 获取时间信息
@@ -138,22 +136,9 @@ export default function Sleep() {
     if (result.code === 200) await fetchRecords();
   };
 
-  const handleSubmit = async () => {
-    const api = $app.$DefaultApi;
-    try {
-      const result = await api.postSleep({ sleepLogDto: formData });
-      if (result.code === 200) {
-        await MessagePlugin.success(result.msg || "添加睡眠记录成功");
-        setVisible(false);
-        await fetchRecords();
-        await fetchChartData();
-      } else {
-        await MessagePlugin.error(result.msg || "添加睡眠记录失败");
-      }
-    } catch (error) {
-      await MessagePlugin.error("添加睡眠记录失败，请检查网络连接");
-      console.error(error);
-    }
+  const handleSuccess = async () => {
+    await fetchRecords();
+    await fetchChartData();
   };
 
   return (
@@ -308,58 +293,12 @@ export default function Sleep() {
         />
       </Card>
 
-      {/* 新增记录对话框 */}
-      <Dialog
+      {/* 使用解耦的睡眠记录对话框组件 */}
+      <SleepDialog
         visible={visible}
         onClose={() => setVisible(false)}
-        header="新增睡眠记录"
-        confirmBtn="提交"
-        onConfirm={handleSubmit}
-      >
-        <Form>
-          <Form.FormItem label="入睡时间">
-            <DatePicker
-              enableTimePicker
-              format="YYYY-MM-DD HH:mm:ss"
-              value={formData.sleepStart}
-              onChange={(val) => {
-                if (val) {
-                  const date = new Date(val);
-                  setFormData({ ...formData, sleepStart: date });
-                }
-              }}
-            />
-          </Form.FormItem>
-          <Form.FormItem label="醒来时间">
-            <DatePicker
-              enableTimePicker
-              format="YYYY-MM-DD HH:mm:ss"
-              value={formData.sleepEnd}
-              onChange={(val) => {
-                if (val) {
-                  const date = new Date(val);
-                  setFormData({ ...formData, sleepEnd: date });
-                }
-              }}
-            />
-          </Form.FormItem>
-          <Form.FormItem label="睡眠质量">
-            <Select
-              value={formData.sleepQuality}
-              onChange={(val) =>
-                setFormData({ ...formData, sleepQuality: val as number })
-              }
-              options={[
-                { label: "1级", value: 1 },
-                { label: "2级", value: 2 },
-                { label: "3级", value: 3 },
-                { label: "4级", value: 4 },
-                { label: "5级", value: 5 },
-              ]}
-            />
-          </Form.FormItem>
-        </Form>
-      </Dialog>
+        onSuccess={handleSuccess}
+      />
     </div>
   );
 }

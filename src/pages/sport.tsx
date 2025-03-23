@@ -1,13 +1,8 @@
 import {
   Button,
   Card,
-  Dialog,
-  Form,
-  InputNumber,
   Table,
-  DatePicker,
   DateRangePicker,
-  Input,
   Select,
 } from "tdesign-react";
 import { useEffect, useState } from "react";
@@ -15,6 +10,7 @@ import * as echarts from "echarts";
 import {ExerciseLogDto, ResponseResult, ResponseResultPageExerciseLog} from "../api";
 import { $app } from "../app/app";
 import { MessagePlugin } from "tdesign-react";
+import ExerciseDialog from "./components/Dialogs/ExerciseDialog";
 
 const toDateString = (dt: Date) => {
   // 获取时间信息
@@ -152,22 +148,9 @@ export default function Sport() {
     }
   };
 
-  const handleSubmit = async () => {
-    const api = $app.$DefaultApi;
-    try {
-      const result = await api.postExercise({ exerciseLogDto: formData });
-      if (result.code === 200) {
-        await MessagePlugin.success(result.msg || "添加运动记录成功");
-        setVisible(false);
-        await fetchRecords();
-        await fetchChartData();
-      } else {
-        await MessagePlugin.error(result.msg || "添加运动记录失败");
-      }
-    } catch (error) {
-      await MessagePlugin.error("添加运动记录失败，请检查网络连接");
-      console.error(error);
-    }
+  const handleSuccess = async () => {
+    await fetchRecords();
+    await fetchChartData();
   };
 
   return (
@@ -328,56 +311,12 @@ export default function Sport() {
         />
       </Card>
 
-      {/* 新增记录对话框 */}
-      <Dialog
+      {/* 使用解耦的运动记录对话框组件 */}
+      <ExerciseDialog
         visible={visible}
         onClose={() => setVisible(false)}
-        header="新增运动记录"
-        confirmBtn="提交"
-        onConfirm={handleSubmit}
-      >
-        <Form>
-          <Form.FormItem label="运动类型">
-            <Input
-              value={formData.exerciseType}
-              onChange={(val) => setFormData({ ...formData, exerciseType: val })}
-            />
-          </Form.FormItem>
-          <Form.FormItem label="时长 (分钟)">
-            <InputNumber
-              value={formData.durationMinutes}
-              onChange={(val) =>
-                setFormData({ ...formData, durationMinutes: val })
-              }
-            />
-          </Form.FormItem>
-          <Form.FormItem label="消耗热量 (千卡)">
-            <InputNumber
-              value={formData.caloriesBurned}
-              onChange={(val) =>
-                setFormData({ ...formData, caloriesBurned: val })
-              }
-            />
-          </Form.FormItem>
-          <Form.FormItem label="运动开始时间">
-            <DatePicker
-              enableTimePicker
-              format="YYYY-MM-DD HH:mm:ss"
-              value={
-                formData.startTimestamp
-                  ? new Date(formData.startTimestamp)
-                  : undefined
-              }
-              onChange={(val) => {
-                if (val) {
-                  const date = new Date(val);
-                  setFormData({ ...formData, startTimestamp: date.getTime() });
-                }
-              }}
-            />
-          </Form.FormItem>
-        </Form>
-      </Dialog>
+        onSuccess={handleSuccess}
+      />
     </div>
   );
 }

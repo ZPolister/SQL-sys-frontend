@@ -1,13 +1,8 @@
 import {
   Button,
   Card,
-  Dialog,
-  Form,
-  InputNumber,
   Table,
-  DatePicker,
   DateRangePicker,
-  Input,
   Select,
 } from "tdesign-react";
 import { useEffect, useState } from "react";
@@ -15,6 +10,7 @@ import * as echarts from "echarts";
 import {DietLogDto, ResponseResult, ResponseResultPageDietLog} from "../api";
 import { $app } from "../app/app";
 import { MessagePlugin } from "tdesign-react";
+import DietDialog from "./components/Dialogs/DietDialog";
 
 const toDateString = (dt: Date) => {
   // 获取时间信息
@@ -142,22 +138,9 @@ export default function Nutrition() {
     if (result.code === 200) await fetchRecords();
   };
 
-  const handleSubmit = async () => {
-    const api = $app.$DefaultApi;
-    try {
-      const result = await api.postDiet({ dietLogDto: formData }) as ResponseResult;
-      if (result.code === 200) {
-        await MessagePlugin.success(result.msg || "添加饮食记录成功");
-        setVisible(false);
-        await fetchRecords();
-        await fetchChartData();
-      } else {
-        await MessagePlugin.error(result.msg || "添加饮食记录失败");
-      }
-    } catch (error) {
-      await MessagePlugin.error("添加饮食记录失败，请检查网络连接");
-      console.error(error);
-    }
+  const handleSuccess = async () => {
+    await fetchRecords();
+    await fetchChartData();
   };
 
   return (
@@ -318,56 +301,12 @@ export default function Nutrition() {
         />
       </Card>
 
-      {/* 新增记录对话框 */}
-      <Dialog
+      {/* 使用解耦的饮食记录对话框组件 */}
+      <DietDialog
         visible={visible}
         onClose={() => setVisible(false)}
-        header="新增饮食记录"
-        confirmBtn="提交"
-        onConfirm={handleSubmit}
-      >
-        <Form>
-          <Form.FormItem label="食物名称">
-            <Input
-              value={formData.foodItem}
-              onChange={(val) => setFormData({ ...formData, foodItem: val })}
-            />
-          </Form.FormItem>
-          <Form.FormItem label="数量 (克)">
-            <InputNumber
-              value={formData.quantityGrams}
-              onChange={(val) =>
-                setFormData({ ...formData, quantityGrams: val })
-              }
-            />
-          </Form.FormItem>
-          <Form.FormItem label="热量 (千卡)">
-            <InputNumber
-              value={formData.totalCalories}
-              onChange={(val) =>
-                setFormData({ ...formData, totalCalories: val })
-              }
-            />
-          </Form.FormItem>
-          <Form.FormItem label="食用时间">
-            <DatePicker
-              enableTimePicker
-              format="YYYY-MM-DD HH:mm:ss"
-              value={
-                formData.consumptionTime
-                  ? new Date(formData.consumptionTime)
-                  : undefined
-              }
-              onChange={(val) => {
-                if (val) {
-                  const date = new Date(val);
-                  setFormData({ ...formData, consumptionTime: date.getTime() });
-                }
-              }}
-            />
-          </Form.FormItem>
-        </Form>
-      </Dialog>
+        onSuccess={handleSuccess}
+      />
     </div>
   );
 }
