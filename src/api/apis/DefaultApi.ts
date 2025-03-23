@@ -117,8 +117,8 @@ export interface GetDietPageRequest {
 }
 
 export interface GetExerciseRequest {
-    startDate: Date;
-    endDate: Date;
+    startDate: string;
+    endDate: string;
     pageNum?: number;
     pageSize?: number;
 }
@@ -713,11 +713,11 @@ export class DefaultApi extends runtime.BaseAPI {
         const queryParameters: any = {};
 
         if (requestParameters['startDate'] != null) {
-            queryParameters['startDate'] = (requestParameters['startDate'] as any).toISOString();
+            queryParameters['startDate'] = (requestParameters['startDate'] as any);
         }
 
         if (requestParameters['endDate'] != null) {
-            queryParameters['endDate'] = (requestParameters['endDate'] as any).toISOString();
+            queryParameters['endDate'] = (requestParameters['endDate'] as any);
         }
 
         if (requestParameters['pageNum'] != null) {

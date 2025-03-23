@@ -2,16 +2,16 @@ import {
   Button,
   Card,
   Table,
-  DateRangePicker,
+  DateRangePicker, MessagePlugin,
 } from "tdesign-react";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import * as echarts from "echarts";
 import {
   BiometricRecordDto,
   BiometricRecordVo,
   ResponseResultPageBiometricRecordVo,
 } from "../api";
-import { $app } from "../app/app";
+import {$app} from "../app/app";
 import BiometricDialog from "./components/Dialogs/BiometricDialog";
 
 const toDateString = (dt: Date) => {
@@ -72,7 +72,7 @@ export default function BiometricData() {
 
   const fetchChartData = async () => {
     const api = $app.$DefaultApi;
-    const result = await api.getHealthChart({ timeRange });
+    const result = await api.getHealthChart({timeRange});
     if (result.code === 200) setChartData(result.data);
   };
 
@@ -101,7 +101,7 @@ export default function BiometricData() {
     if (chartDom) {
       const myChart = echarts.init(chartDom);
       const option = {
-        tooltip: { trigger: "axis" },
+        tooltip: {trigger: "axis"},
         legend: {
           data: ["体重", "收缩压", "舒张压", "血糖", "血脂", "BMI"],
           bottom: 0,
@@ -182,8 +182,19 @@ export default function BiometricData() {
 
   const handleDelete = async (id: number) => {
     const api = $app.$DefaultApi;
-    const result = await api.deleteHealthBiometricId({ id });
-    if (result.code === 200) await fetchRecords();
+    try {
+      const result = await api.deleteHealthBiometricId({id});
+      if (result.code === 200) {
+        await fetchRecords();
+        await fetchChartData();
+        await MessagePlugin.success(result.msg || "删除记录成功");
+      } else {
+        await MessagePlugin.error(result.msg || "删除记录失败");
+      }
+    } catch (error) {
+      await MessagePlugin.error("删除记录失败，请检查网络连接");
+      console.error(error);
+    }
   };
 
   const handleSuccess = async () => {
@@ -267,7 +278,7 @@ export default function BiometricData() {
               ellipsis: true,
               title: "身高",
               colKey: "heightCm",
-              cell: ({ row }) => `${row.heightCm} cm`,
+              cell: ({row}) => `${row.heightCm} cm`,
             },
             {
               align: "center",
@@ -275,7 +286,7 @@ export default function BiometricData() {
               ellipsis: true,
               title: "体重",
               colKey: "weightKg",
-              cell: ({ row }) => `${row.weightKg} kg`,
+              cell: ({row}) => `${row.weightKg} kg`,
             },
             {
               align: "center",
@@ -283,7 +294,7 @@ export default function BiometricData() {
               ellipsis: true,
               title: "收缩压",
               colKey: "systolicPressure",
-              cell: ({ row }) => `${row.systolicPressure} mmHg`,
+              cell: ({row}) => `${row.systolicPressure} mmHg`,
             },
             {
               align: "center",
@@ -291,7 +302,7 @@ export default function BiometricData() {
               ellipsis: true,
               title: "舒张压",
               colKey: "diastolicPressure",
-              cell: ({ row }) => `${row.diastolicPressure} mmHg`,
+              cell: ({row}) => `${row.diastolicPressure} mmHg`,
             },
             {
               align: "center",
@@ -299,7 +310,7 @@ export default function BiometricData() {
               ellipsis: true,
               title: "血糖",
               colKey: "bloodGlucose",
-              cell: ({ row }) => `${row.bloodGlucose} mmol/L`,
+              cell: ({row}) => `${row.bloodGlucose} mmol/L`,
             },
             {
               align: "center",
@@ -307,7 +318,7 @@ export default function BiometricData() {
               ellipsis: true,
               title: "血脂",
               colKey: "bloodLipid",
-              cell: ({ row }) => `${row.bloodLipid} mmol/L`,
+              cell: ({row}) => `${row.bloodLipid} mmol/L`,
             },
             {
               align: "center",
@@ -315,7 +326,7 @@ export default function BiometricData() {
               ellipsis: true,
               title: "测量时间",
               colKey: "measurementTime",
-              cell: ({ row }) => {
+              cell: ({row}) => {
                 const date = row.measurementTime;
                 return date?.toLocaleString("zh-CN", {
                   year: "numeric",
@@ -334,7 +345,7 @@ export default function BiometricData() {
               fixed: "right",
               title: "操作",
               colKey: "action",
-              cell: ({ row }) => (
+              cell: ({row}) => (
                 <Button
                   theme="danger"
                   variant="text"

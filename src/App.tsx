@@ -4,10 +4,10 @@ import {ConfigProvider, DialogPlugin, Layout, Link, Loading, Menu} from 'tdesign
 import {
   AccessibilityIcon,
   AppleIcon,
-  DashboardIcon,
+  DashboardIcon, FlagIcon, Hospital1Icon, HospitalIcon,
   LogoutIcon,
   NotificationIcon,
-  SleepIcon,
+  SleepIcon, TaskChecked1Icon,
   ThumbUp1Icon,
 } from "tdesign-icons-react";
 import Overview from "./pages/overview";
@@ -19,6 +19,8 @@ import {$app} from "./app/app";
 import useLoginVM from "./hooks/useLoginVM";
 import Login from "./pages/Login";
 import Goal from "./pages/goal";
+import Check from "./pages/check";
+import Medication from "./pages/medication";
 
 const {HeadMenu, MenuItem} = Menu;
 const {Header, Content, Footer, Aside} = Layout;
@@ -57,10 +59,20 @@ function SideMenu({selected, onSelected}: SideMenuProps) {
       label: "睡眠数据"
     },
     {
+      value: "check",
+      icon: <TaskChecked1Icon/>,
+      label: "体检提醒"
+    },
+    {
+      value: "medication",
+      icon: <Hospital1Icon/>,
+      label: "服药数据与提醒"
+    },
+    {
       value: "goal",
-      icon: <SleepIcon/>,
+      icon: <FlagIcon/>,
       label: "健康分析与目标"
-    }
+    },
   ];
 
   // 渲染组件保持简洁
@@ -104,6 +116,10 @@ const App: React.FC = () => {
         return <Sleep/>;
       case 'goal':
         return <Goal/>;
+      case 'check':
+        return <Check/>;
+      case 'medication':
+        return <Medication/>;
       default:
         return <div>内容加载中...</div>;
     }

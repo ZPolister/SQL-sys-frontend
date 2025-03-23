@@ -15,6 +15,7 @@ import {
     HealthGoal
 } from "../api";
 import {$app} from "../app/app";
+import HealthCheckDialog from "./components/Dialogs/HealthCheckDialog";
 
 const DataCard = ({title}: { title: string }) => {
   return (
@@ -39,6 +40,7 @@ export default function Overview() {
   const [showExerciseDialog, setShowExerciseDialog] = useState(false);
   const [showDietDialog, setShowDietDialog] = useState(false);
   const [showSleepDialog, setShowSleepDialog] = useState(false);
+  const [showHealthCheckDialog, setShowHealthCheckDialog] = useState(false);
 
   const [biometricData, setBiometricData] = useState<BiometricRecordVo | null>(null);
   const [exerciseData, setExerciseData] = useState<ExerciseLogDto | null>(null);
@@ -285,7 +287,12 @@ export default function Overview() {
       <Card
         title={"健康体检提醒"}
         actions={(
-          <Button theme="primary" variant="text" icon={<AddIcon/>}>
+          <Button
+            theme="primary"
+            variant="text"
+            icon={<AddIcon/>}
+            onClick={() => setShowHealthCheckDialog(true)}
+          >
             设置提醒
           </Button>
         )}
@@ -366,6 +373,21 @@ export default function Overview() {
           });
         }}
       />
+
+      <HealthCheckDialog
+        visible={showHealthCheckDialog}
+        onClose={() => setShowHealthCheckDialog(false)}
+        onSuccess={() => {
+          setShowHealthCheckDialog(false);
+          // 刷新数据
+          $app.$DefaultApi.getHealthCheckReminder().then((res: any) => {
+            if (res.code === 200 && res.data) {
+              setHealthCheckReminder(res.data);
+            }
+          });
+        }}
+      />
+
     </div>
   )
 }

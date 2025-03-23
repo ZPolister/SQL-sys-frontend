@@ -74,8 +74,8 @@ export default function Sport() {
   const fetchRecords = async (paginationParams = pagination) => {
     const api = $app.$DefaultApi;
     const result = (await api.getExercise({
-      startDate: new Date(dateRange[0]),
-      endDate: new Date(dateRange[1]),
+      startDate: dateRange[0],
+      endDate: dateRange[1],
       pageNum: paginationParams.pageNum,
       pageSize: paginationParams.pageSize,
     })) as ResponseResultPageExerciseLog;
