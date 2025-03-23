@@ -27,10 +27,10 @@ export interface ExerciseLogDto {
     exerciseType: string;
     /**
      * 开始时间（时间戳格式）
-     * @type {Date}
+     * @type {number}
      * @memberof ExerciseLogDto
      */
-    startTimestamp: Date;
+    startTimestamp: number;
     /**
      * 持续时间（分钟）
      * @type {number}
@@ -92,7 +92,7 @@ export function ExerciseLogDtoToJSONTyped(value?: ExerciseLogDto | null, ignoreD
     return {
         
         'exerciseType': value['exerciseType'],
-        'startTimestamp': ((value['startTimestamp']).toISOString()),
+        'startTimestamp': ((value['startTimestamp'])),
         'durationMinutes': value['durationMinutes'],
         'distanceKm': value['distanceKm'],
         'caloriesBurned': value['caloriesBurned'],

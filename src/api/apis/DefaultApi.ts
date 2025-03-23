@@ -1274,7 +1274,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * 返回指定时间范围内每天的睡眠时长数据，用于生成柱状图，所对应的地址：https://echarts.apache.org/examples/zh/editor.html?c=bar-tick-align
      * 获取每日睡眠时长数据
      */
-    async getSleepDuration(requestParameters: GetSleepDurationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+    async getSleepDuration(requestParameters: GetSleepDurationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
         const response = await this.getSleepDurationRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -1315,11 +1315,11 @@ export class DefaultApi extends runtime.BaseAPI {
         const queryParameters: any = {};
 
         if (requestParameters['startDate'] != null) {
-            queryParameters['startDate'] = (requestParameters['startDate'] as any).toISOString();
+            queryParameters['startDate'] = (requestParameters['startDate'] as any);
         }
 
         if (requestParameters['endDate'] != null) {
-            queryParameters['endDate'] = (requestParameters['endDate'] as any).toISOString();
+            queryParameters['endDate'] = (requestParameters['endDate'] as any);
         }
 
         if (requestParameters['pageNum'] != null) {
