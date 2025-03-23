@@ -49,11 +49,11 @@ export default function BiometricData() {
   });
 
   useEffect(() => {
-    fetchChartData();
+    fetchChartData().finally();
   }, [timeRange]);
 
   useEffect(() => {
-    fetchRecords();
+    fetchRecords().finally();
   }, []);
 
   useEffect(() => {

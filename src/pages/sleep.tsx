@@ -43,11 +43,11 @@ export default function Sleep() {
   });
 
   useEffect(() => {
-    fetchChartData();
+    fetchChartData().finally();
   }, [timeRange]);
 
   useEffect(() => {
-    fetchRecords();
+    fetchRecords().finally();
   }, []);
 
   useEffect(() => {
@@ -278,7 +278,7 @@ export default function Sleep() {
                 pageNum: 1,
               };
               setPagination(newPagination);
-              fetchRecords(newPagination);
+              fetchRecords(newPagination).finally();
             },
             onChange: async (pageInfo) => {
               const newPagination = {

@@ -29,7 +29,7 @@ export default function Goal() {
   useEffect(() => {
     abortController.current = new AbortController();
     fetchCurrentGoal().finally();
-    fetchAnalysis().finally();
+    // 不再自动获取建议，改为按钮触发
 
     return () => {
       console.log("组件卸载")
@@ -173,7 +173,7 @@ export default function Goal() {
       });
       if (result.code === 200) {
         setVisible(false);
-        fetchCurrentGoal();
+        fetchCurrentGoal().finally();
       }
     } catch (error) {
       console.error("创建目标失败:", error);
@@ -252,28 +252,39 @@ export default function Goal() {
       {/* 健康建议卡片 */}
       <Card title="健康建议">
         <div className="space-y-4">
-          {analysis.map((line, index) => {
-            // 排除包含<goal>标签的行
-            if (!line.includes("<goal>")) {
-              return <p key={index} className="text-gray-700">{line}</p>;
-            }
-            return null;
-          })}
+          {analysis.length > 0 ? (
+            <>
+              {analysis.map((line, index) => {
+                // 排除包含<goal>标签的行
+                if (!line.includes("<goal>")) {
+                  return <p key={index} className="text-gray-700">{line}</p>;
+                }
+                return null;
+              })}
 
-          {goalSuggestion && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <h4 className="text-lg font-medium mb-2">建议目标</h4>
-              <p className="mb-2">
-                {renderGoalCategory(goalSuggestion.goalCategory)}：
-                {goalSuggestion.targetValue}
-                {goalSuggestion.goalCategory === "WEIGHT_LOSS" && " kg"}
-                {goalSuggestion.goalCategory === "EXERCISE_CALORIES" && " kcal"}
-                {goalSuggestion.goalCategory === "BLOOD_SUGAR" && " mmol/L"}
-                {goalSuggestion.goalCategory === "BLOOD_LIPID" && " mmol/L"}
-              </p>
-              <p className="mb-4">目标日期：{new Date(goalSuggestion.targetDate).toLocaleDateString()}</p>
-              <Button theme="primary" onClick={handleQuickCreateGoal}>
-                采纳建议
+              {goalSuggestion && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                  <h4 className="text-lg font-medium mb-2">建议目标</h4>
+                  <p className="mb-2">
+                    {renderGoalCategory(goalSuggestion.goalCategory)}：
+                    {goalSuggestion.targetValue}
+                    {goalSuggestion.goalCategory === "WEIGHT_LOSS" && " kg"}
+                    {goalSuggestion.goalCategory === "EXERCISE_CALORIES" && " kcal"}
+                    {goalSuggestion.goalCategory === "BLOOD_SUGAR" && " mmol/L"}
+                    {goalSuggestion.goalCategory === "BLOOD_LIPID" && " mmol/L"}
+                  </p>
+                  <p className="mb-4">目标日期：{new Date(goalSuggestion.targetDate).toLocaleDateString()}</p>
+                  <Button theme="primary" onClick={handleQuickCreateGoal}>
+                    采纳建议
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-4">
+              <p className="text-gray-600 mb-4">点击下方按钮获取个性化健康建议</p>
+              <Button theme="primary" onClick={fetchAnalysis}>
+                获取建议
               </Button>
             </div>
           )}

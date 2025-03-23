@@ -44,11 +44,11 @@ export default function Nutrition() {
   });
 
   useEffect(() => {
-    fetchChartData();
+    fetchChartData().finally();
   }, [timeRange]);
 
   useEffect(() => {
-    fetchRecords();
+    fetchRecords().finally();
   }, []);
 
   useEffect(() => {

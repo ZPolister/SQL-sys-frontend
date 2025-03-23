@@ -44,11 +44,11 @@ export default function Sport() {
   });
 
   useEffect(() => {
-    fetchChartData();
+    fetchChartData().finally();
   }, [timeRange]);
 
   useEffect(() => {
-    fetchRecords();
+    fetchRecords().finally();
   }, []);
 
   useEffect(() => {
@@ -136,14 +136,14 @@ export default function Sport() {
     try {
       const result = await api.deleteExerciseLogId({ logId: id });
       if (result.code === 200) {
-        MessagePlugin.success(result.msg || "删除运动记录成功");
+        await MessagePlugin.success(result.msg || "删除运动记录成功");
         await fetchRecords();
         await fetchChartData();
       } else {
-        MessagePlugin.error(result.msg || "删除运动记录失败");
+        await MessagePlugin.error(result.msg || "删除运动记录失败");
       }
     } catch (error) {
-      MessagePlugin.error("删除运动记录失败，请检查网络连接");
+      await MessagePlugin.error("删除运动记录失败，请检查网络连接");
       console.error(error);
     }
   };
@@ -211,7 +211,7 @@ export default function Sport() {
                     toDateString(new Date(val[0])),
                     toDateString(new Date(val[1])),
                   ]);
-                  fetchRecords();
+                  fetchRecords().finally();
                 }
               }}
             />
@@ -296,7 +296,7 @@ export default function Sport() {
                 pageNum: 1,
               };
               setPagination(newPagination);
-              fetchRecords(newPagination);
+              fetchRecords(newPagination).finally();
             },
             onChange: async (pageInfo) => {
               const newPagination = {
