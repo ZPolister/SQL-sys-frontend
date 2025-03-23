@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import * as echarts from "echarts";
 import { SleepLogDto, ResponseResultPageSleepLog } from "../api";
 import { $app } from "../app/app";
+import { MessagePlugin } from "tdesign-react";
 
 const toDateString = (dt: Date) => {
   // 获取时间信息
@@ -139,11 +140,19 @@ export default function Sleep() {
 
   const handleSubmit = async () => {
     const api = $app.$DefaultApi;
-    const result = await api.postSleep({ sleepLogDto: formData });
-    if (result) {
-      setVisible(false);
-      await fetchRecords();
-      await fetchChartData();
+    try {
+      const result = await api.postSleep({ sleepLogDto: formData });
+      if (result.code === 200) {
+        await MessagePlugin.success(result.msg || "添加睡眠记录成功");
+        setVisible(false);
+        await fetchRecords();
+        await fetchChartData();
+      } else {
+        await MessagePlugin.error(result.msg || "添加睡眠记录失败");
+      }
+    } catch (error) {
+      await MessagePlugin.error("添加睡眠记录失败，请检查网络连接");
+      console.error(error);
     }
   };
 
@@ -304,8 +313,10 @@ export default function Sleep() {
         visible={visible}
         onClose={() => setVisible(false)}
         header="新增睡眠记录"
+        confirmBtn="提交"
+        onConfirm={handleSubmit}
       >
-        <Form onSubmit={handleSubmit}>
+        <Form>
           <Form.FormItem label="入睡时间">
             <DatePicker
               enableTimePicker
@@ -347,7 +358,6 @@ export default function Sleep() {
               ]}
             />
           </Form.FormItem>
-          <Button type="submit">提交</Button>
         </Form>
       </Dialog>
     </div>

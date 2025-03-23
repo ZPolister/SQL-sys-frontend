@@ -12,8 +12,9 @@ import {
 } from "tdesign-react";
 import { useEffect, useState } from "react";
 import * as echarts from "echarts";
-import { DietLogDto, ResponseResultPageDietLog } from "../api";
+import {DietLogDto, ResponseResult, ResponseResultPageDietLog} from "../api";
 import { $app } from "../app/app";
+import { MessagePlugin } from "tdesign-react";
 
 const toDateString = (dt: Date) => {
   // 获取时间信息
@@ -143,11 +144,19 @@ export default function Nutrition() {
 
   const handleSubmit = async () => {
     const api = $app.$DefaultApi;
-    const result = await api.postDiet({ dietLogDto: formData });
-    if (result) {
-      setVisible(false);
-      await fetchRecords();
-      await fetchChartData();
+    try {
+      const result = await api.postDiet({ dietLogDto: formData }) as ResponseResult;
+      if (result.code === 200) {
+        await MessagePlugin.success(result.msg || "添加饮食记录成功");
+        setVisible(false);
+        await fetchRecords();
+        await fetchChartData();
+      } else {
+        await MessagePlugin.error(result.msg || "添加饮食记录失败");
+      }
+    } catch (error) {
+      await MessagePlugin.error("添加饮食记录失败，请检查网络连接");
+      console.error(error);
     }
   };
 
@@ -314,8 +323,10 @@ export default function Nutrition() {
         visible={visible}
         onClose={() => setVisible(false)}
         header="新增饮食记录"
+        confirmBtn="提交"
+        onConfirm={handleSubmit}
       >
-        <Form onSubmit={handleSubmit}>
+        <Form>
           <Form.FormItem label="食物名称">
             <Input
               value={formData.foodItem}
@@ -355,7 +366,6 @@ export default function Nutrition() {
               }}
             />
           </Form.FormItem>
-          <Button type="submit">提交</Button>
         </Form>
       </Dialog>
     </div>

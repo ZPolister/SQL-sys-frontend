@@ -16,6 +16,7 @@ import {
   ResponseResultPageBiometricRecordVo,
 } from "../api";
 import { $app } from "../app/app";
+import { MessagePlugin } from "tdesign-react";
 
 const toDateString = (dt: Date) => {
   // 获取时间信息
@@ -191,12 +192,21 @@ export default function BiometricData() {
 
   const handleSubmit = async () => {
     const api = $app.$DefaultApi;
-    const result = await api.postHealthBiometric({
-      biometricRecordDto: formData,
-    });
-    if (result.code === 200) {
-      setVisible(false);
-      await fetchRecords();
+    try {
+      const result = await api.postHealthBiometric({
+        biometricRecordDto: formData,
+      });
+      if (result.code === 200) {
+        await MessagePlugin.success(result.msg || "添加体征数据成功");
+        setVisible(false);
+        await fetchRecords();
+        await fetchChartData();
+      } else {
+        await MessagePlugin.error(result.msg || "添加体征数据失败");
+      }
+    } catch (error) {
+      await MessagePlugin.error("添加体征数据失败，请检查网络连接");
+      console.error(error);
     }
   };
 
@@ -385,8 +395,10 @@ export default function BiometricData() {
         visible={visible}
         onClose={() => setVisible(false)}
         header="新增体征数据"
+        confirmBtn="提交"
+        onConfirm={handleSubmit}
       >
-        <Form onSubmit={handleSubmit}>
+        <Form>
           <Form.FormItem label="身高 (cm)">
             <InputNumber
               value={formData.heightCm}
@@ -446,7 +458,6 @@ export default function BiometricData() {
               }}
             />
           </Form.FormItem>
-          <Button type="submit">提交</Button>
         </Form>
       </Dialog>
     </div>
