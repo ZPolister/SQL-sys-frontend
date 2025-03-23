@@ -58,6 +58,10 @@ export default function Goal() {
     const decoder = new TextDecoder(); // 初始化解码器
     let buffer = ''; // 用于缓存未解析的数据
 
+    const trimText = (rawText: string): string => {
+      return (rawText.replace(/data:/g, '').replace(/\n\n$/, ""))
+    }
+
     try {
       const response = await api.getAnalysisStream(
         {},
@@ -83,12 +87,16 @@ export default function Goal() {
         const {done, value} = await reader.read();
         if (done) break; // 流结束
 
+        const decodedText = decoder.decode(value, {stream: true});
+        console.log("解码数据块:", decodedText)
+
         // 解码数据块并追加到缓存中
-        buffer += decoder.decode(value, {stream: true});
+        // buffer += decodedText
+        const parsedText = trimText(decodedText)
 
         // 解析缓存中的数据，去除 `data:` 前缀和换行符
-        const {parsedText, remainingBuffer} = parseBuffer(buffer);
-        buffer = remainingBuffer; // 更新缓存
+        // const {parsedText, remainingBuffer} = parseBuffer(buffer);
+        // buffer = remainingBuffer; // 更新缓存
 
         // console.log("text", parsedText)
 
@@ -101,6 +109,8 @@ export default function Goal() {
         // 查找并解析目标建议
         parseGoal(analysisText.current);
       }
+
+      console.log("请求完成", analysisText.current)
     } catch (error) {
       console.error("获取分析失败:", error);
     }
@@ -111,31 +121,32 @@ export default function Goal() {
    * @param {string} buffer - 缓存数据
    * @returns {Object} - { parsedText: string, remainingBuffer: string }
    */
-  const parseBuffer = (buffer) => {
-    // 按换行符分割数据块
-    const lines = buffer.split("\n");
-
-    // 解析每行数据，去除 `data:` 前缀
-    const parsedLines = lines
-      .map(line => line.trim()) // 去除空白字符
-      .filter(line => line.startsWith("data:")) // 过滤以 `data:` 开头的行
-      .map(line => line.slice(5).trim()); // 去除 `data:` 前缀并去除空白字符
-
-    // 将解析后的行合并为文本
-    const parsedText = parsedLines.join("\n");
-
-    // 保留未解析的部分（最后一行的未完成数据）
-    const remainingBuffer = lines[lines.length - 1].startsWith("data:") ? '' : lines[lines.length - 1];
-
-    return {parsedText, remainingBuffer};
-  };
+  // const parseBuffer = (buffer) => {
+  //   // 按换行符分割数据块
+  //   const lines = buffer.split("\n");
+  //
+  //   // 解析每行数据，去除 `data:` 前缀
+  //   const parsedLines = lines
+  //     .map(line => line.trim()) // 去除空白字符
+  //     .filter(line => line.startsWith("data:")) // 过滤以 `data:` 开头的行
+  //     .map(line => line.slice(5).trim()); // 去除 `data:` 前缀并去除空白字符
+  //
+  //   // 将解析后的行合并为文本
+  //   const parsedText = parsedLines.join("\n");
+  //
+  //   // 保留未解析的部分（最后一行的未完成数据）
+  //   const remainingBuffer = lines[lines.length - 1].startsWith("data:") ? '' : lines[lines.length - 1];
+  //
+  //   return {parsedText, remainingBuffer};
+  // };
 
   /**
    * 更新分析结果状态
    * @param {string} text - 待更新的文本
    */
-  const updateAnalysis = (text) => {
-    const lines = text.split("\n").filter(line => line.trim());
+  const updateAnalysis = (text: string) => {
+    const replacedText = text.replace(/```([\s\S]*?)```/, "").trim()
+    const lines = replacedText.split("\n")
     setAnalysis(lines); // 更新状态
   };
 
@@ -143,11 +154,15 @@ export default function Goal() {
    * 解析目标建议并更新状态
    * @param {string} text - 待解析的文本
    */
-  const parseGoal = (text) => {
-    const goalMatch = text.match(/<goal>(.*?)<\/goal>/);
+  const parseGoal = (text: string) => {
+    const goalMatch = text.match(/```([\s\S]*?)```/);
     if (goalMatch) {
+      const goalText = (goalMatch[1]).trim();
+
+      console.log("目标建议文本:", goalText);
+
       try {
-        const goalData = JSON.parse(goalMatch[1]);
+        const goalData = JSON.parse(goalText);
         console.log("目标建议:", goalData);
         setGoalSuggestion(goalData);
       } catch (e) {
@@ -255,11 +270,7 @@ export default function Goal() {
           {analysis.length > 0 ? (
             <>
               {analysis.map((line, index) => {
-                // 排除包含<goal>标签的行
-                if (!line.includes("<goal>")) {
-                  return <p key={index} className="text-gray-700">{line}</p>;
-                }
-                return null;
+                return <p key={index} className="text-gray-700">{line}</p>;
               })}
 
               {goalSuggestion && (
