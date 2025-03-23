@@ -54,66 +54,109 @@ export default function Goal() {
     console.log("发起请求")
     const currentFetchController = abortController.current;
 
-    const api = $app.$DefaultApi;
-    const decoder = new TextDecoder(); // 初始化解码器
-    let buffer = ''; // 用于缓存未解析的数据
+    // const api = $app.$DefaultApi;
+    // const decoder = new TextDecoder(); // 初始化解码器
+    // let buffer = ''; // 用于缓存未解析的数据
 
-    const trimText = (rawText: string): string => {
-      return (rawText.replace(/data:/g, '').replace(/\n\n$/, ""))
-    }
+    const evtSrc = new EventSource("/api/analysis/stream");
 
-    try {
-      const response = await api.getAnalysisStream(
-        {},
-        {signal: abortController.current.signal}
-      ) as Response;
-
-      if (!response.body) {
-        throw new Error("响应体为空");
+    evtSrc.onopen = (event) => {
+      if (currentFetchController.signal.aborted) {
+        console.log("取消请求")
+        evtSrc.close();
+        return;
       }
 
-      const reader = response.body.getReader();
+      analysisText.current = ""
+      console.log("事件源打开:", event);
+    };
 
-      analysisText.current = '';
-
-      while (true) {
-        // 检查是否被取消
-        if (currentFetchController.signal.aborted) {
-          console.log("取消请求")
-          await reader.cancel()
-          return;
-        }
-
-        const {done, value} = await reader.read();
-        if (done) break; // 流结束
-
-        const decodedText = decoder.decode(value, {stream: true});
-        console.log("解码数据块:", decodedText)
-
-        // 解码数据块并追加到缓存中
-        // buffer += decodedText
-        const parsedText = trimText(decodedText)
-
-        // 解析缓存中的数据，去除 `data:` 前缀和换行符
-        // const {parsedText, remainingBuffer} = parseBuffer(buffer);
-        // buffer = remainingBuffer; // 更新缓存
-
-        // console.log("text", parsedText)
-
-        // 更新状态
-        if (parsedText) {
-          analysisText.current += parsedText;
-          updateAnalysis(analysisText.current);
-        }
-
-        // 查找并解析目标建议
-        parseGoal(analysisText.current);
+    evtSrc.onmessage = (event) => {
+      if (currentFetchController.signal.aborted) {
+        console.log("取消请求")
+        evtSrc.close();
+        return;
       }
 
-      console.log("请求完成", analysisText.current)
-    } catch (error) {
-      console.error("获取分析失败:", error);
-    }
+      console.log("接收到事件:", event.data)
+      analysisText.current += event.data;
+      updateAnalysis(analysisText.current);
+    };
+
+    evtSrc.onerror = (error) => {
+      console.log("事件源错误或结束:", error);
+      evtSrc.close();
+      parseGoal(analysisText.current)
+    };
+
+
+    // const trimText = (rawText: string): string => {
+    //   // return (rawText.replace(/data:/g, '').replace(/\n\n/g, ""))
+    //   const match = rawText.match(/(?<=data:)([\s\S]*?)(?=\n\n)/);
+    //   console.log("match", match?.[0])
+    //
+    //   if (match) {
+    //     return match[0].replace(/\ndata:/g, "\n");
+    //   } else {
+    //     return ""
+    //   }
+    // }
+
+
+    // try {
+    //   const response = await api.getAnalysisStream(
+    //     {},
+    //     {signal: abortController.current.signal}
+    //   ) as Response;
+    //
+    //   if (!response.body) {
+    //     throw new Error("响应体为空");
+    //   }
+    //
+    //   const reader = response.body.getReader();
+    //
+    //   analysisText.current = '';
+    //
+    //   while (true) {
+    //     // 检查是否被取消
+    //     if (currentFetchController.signal.aborted) {
+    //       console.log("取消请求")
+    //       await reader.cancel()
+    //       return;
+    //     }
+    //
+    //     const {done, value} = await reader.read();
+    //     if (done) break; // 流结束
+    //
+    //     const decodedText = decoder.decode(value, {stream: true});
+    //     console.log("解码数据块:", decodedText)
+    //
+    //     // 解码数据块并追加到缓存中
+    //     // buffer += decodedText
+    //     const parsedText = trimText(decodedText)
+    //
+    //     // 解析缓存中的数据，去除 `data:` 前缀和换行符
+    //     // const {parsedText, remainingBuffer} = parseBuffer(buffer);
+    //     // buffer = remainingBuffer; // 更新缓存
+    //
+    //     // console.log("text", parsedText)
+    //
+    //     // 更新状态
+    //     if (parsedText) {
+    //       analysisText.current += parsedText;
+    //       updateAnalysis(analysisText.current);
+    //     }
+    //
+    //     // 查找并解析目标建议
+    //     parseGoal(analysisText.current);
+    //   }
+    //
+    //   console.log("请求完成", analysisText.current)
+    // } catch (error) {
+    //   console.error("获取分析失败:", error);
+    // }
+
+
   };
 
   /**
@@ -155,7 +198,16 @@ export default function Goal() {
    * @param {string} text - 待解析的文本
    */
   const parseGoal = (text: string) => {
-    const goalMatch = text.match(/```([\s\S]*?)```/);
+    let goalMatch = text.match(
+      /(?<=```json)([\s\S]*?)(?=```)/
+    );
+
+    if (!goalMatch) {
+      goalMatch = text.match(
+        /(?<=```)([\s\S]*?)(?=```)/
+      )
+    }
+
     if (goalMatch) {
       const goalText = (goalMatch[1]).trim();
 
