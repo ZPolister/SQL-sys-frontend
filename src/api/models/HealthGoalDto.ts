@@ -61,7 +61,7 @@ export function HealthGoalDtoFromJSONTyped(json: any, ignoreDiscriminator: boole
         
         'goalCategory': json['goalCategory'],
         'targetValue': json['targetValue'],
-        'targetDate': (new Date(json['targetDate'])),
+        'targetDate': json['targetDate'],
     };
 }
 
@@ -78,7 +78,7 @@ export function HealthGoalDtoToJSONTyped(value?: HealthGoalDto | null, ignoreDis
         
         'goalCategory': value['goalCategory'],
         'targetValue': value['targetValue'],
-        'targetDate': ((value['targetDate']).toISOString()),
+        'targetDate': ((value['targetDate'])),
     };
 }
 

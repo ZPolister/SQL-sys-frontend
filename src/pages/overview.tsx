@@ -16,6 +16,7 @@ import {
 } from "../api";
 import {$app} from "../app/app";
 import HealthCheckDialog from "./components/Dialogs/HealthCheckDialog";
+import GoalDialog from "./components/Dialogs/GoalDialog";
 
 const DataCard = ({title}: { title: string }) => {
   return (
@@ -41,6 +42,7 @@ export default function Overview() {
   const [showDietDialog, setShowDietDialog] = useState(false);
   const [showSleepDialog, setShowSleepDialog] = useState(false);
   const [showHealthCheckDialog, setShowHealthCheckDialog] = useState(false);
+  const [showGoalDialog, setShowGoalDialog] = useState(false);
 
   const [biometricData, setBiometricData] = useState<BiometricRecordVo | null>(null);
   const [exerciseData, setExerciseData] = useState<ExerciseLogDto | null>(null);
@@ -249,7 +251,7 @@ export default function Overview() {
         <Card
           title={"健康目标"}
           actions={(
-            <Button theme="primary" variant="text" icon={<AddIcon/>}>
+            <Button theme="primary" variant="text" icon={<AddIcon/>} onClick={() => setShowGoalDialog(true)}>
               设置目标
             </Button>
           )}
@@ -383,6 +385,21 @@ export default function Overview() {
           $app.$DefaultApi.getHealthCheckReminder().then((res: any) => {
             if (res.code === 200 && res.data) {
               setHealthCheckReminder(res.data);
+            }
+          });
+        }}
+      />
+
+      {/* 目标对话框组件 */}
+      <GoalDialog
+        visible={showGoalDialog}
+        onClose={() => setShowGoalDialog(false)}
+        onSuccess={() => {
+          setShowGoalDialog(false);
+          // 刷新数据
+          $app.$DefaultApi.getHealthGoalsCurrent().then((res: any) => {
+            if (res.code === 200 && res.data) {
+              setHealthGoal(res.data);
             }
           });
         }}
