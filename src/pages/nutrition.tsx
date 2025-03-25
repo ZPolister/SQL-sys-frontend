@@ -192,6 +192,11 @@ export default function Nutrition() {
       <Card title="饮食记录">
         <div className="mb-4 flex justify-between items-center">
           <div className="flex gap-4 items-center">
+            <Button theme="success" onClick={() => {
+              downloadExportExcel();
+            }}>
+              导出Excel
+            </Button>
             <DateRangePicker
               placeholder={["开始时间", "结束时间"]}
               value={dateRange}
@@ -310,3 +315,23 @@ export default function Nutrition() {
     </div>
   );
 }
+
+// 新增导出Excel函数
+const downloadExportExcel = async () => {
+  try {
+    const api = $app.$DefaultApi;
+    const response = await api.getExportDiet() as any; // 假设后端有导出接口
+    if (response && response.type === 'blob') {
+      const url = URL.createObjectURL(new Blob([response]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'diet_records.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+  } catch (error) {
+    await MessagePlugin.error('导出失败，请重试');
+  }
+};

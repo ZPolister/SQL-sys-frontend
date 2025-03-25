@@ -190,6 +190,9 @@ export default function Sleep() {
       <Card title="睡眠记录">
         <div className="mb-4 flex justify-between items-center">
           <div className="flex gap-4 items-center">
+            <Button theme="success" onClick={() => window.open('/api/sleep/export', '_blank')}>
+              导出Excel
+            </Button>
             <DateRangePicker
               placeholder={["开始时间", "结束时间"]}
               value={dateRange}
