@@ -6,7 +6,8 @@ import {MessagePlugin} from "tdesign-react";
 export class HealthApp extends EventTarget {
   $DefaultApi: DefaultApi;
   $SystemControllerApi: SystemControllerApi;
-
+  private autoTheme: boolean = true;
+  
   apiConfig: Configuration;
 
   constructor() {
@@ -38,6 +39,27 @@ export class HealthApp extends EventTarget {
     this.$SystemControllerApi = new SystemControllerApi(this.apiConfig);
 
     this.syncLoginState()
+  }
+
+  /**
+   * 设置深浅色主题
+   * @param theme 'dark' | 'light'
+   * @param auto 是否自动跟随系统
+   */
+  setTheme(theme: 'dark' | 'light', auto: boolean = true) {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('theme-mode', 'dark')
+    } else {
+      document.documentElement.removeAttribute('theme-mode');
+    }
+    this.autoTheme = auto;
+  }
+
+  /**
+   * 获取当前是否处于自动主题模式
+   */
+  isAutoTheme() {
+    return this.autoTheme;
   }
 
   showVersion() {
@@ -100,7 +122,7 @@ export class HealthApp extends EventTarget {
   syncLoginState() {
     this.$DefaultApi.getApiAuthCheckLogin()
       .then(res => {
-        const isLogin: boolean = res.data;
+        const isLogin: boolean = res.data ;
         if (isLogin) {
           MessagePlugin.success('欢迎回来').finally();
           useLoginStore.getState().setState('logged');

@@ -6,6 +6,7 @@ import {
   AppleIcon,
   DashboardIcon, FlagIcon, Hospital1Icon, HospitalIcon,
   LogoutIcon,
+  ModeDarkIcon,
   NotificationIcon,
   SleepIcon, TaskChecked1Icon,
   ThumbUp1Icon,
@@ -169,6 +170,17 @@ const App: React.FC = () => {
                             className="t-menu__operations-icon"
                             onClick={handleNotification}
                           />
+                          <ModeDarkIcon
+                            className="t-menu__operations-icon"
+                            onClick={() => {
+                              if (document.documentElement.getAttribute('theme-mode') === 'dark') {
+                                // 当前是深色模式，切换到浅色模式
+                                $app.setTheme('light', false);
+                              } else {
+                                // 当前是浅色模式，切换到深色模式
+                                $app.setTheme('dark', false);
+                              }
+                            }}/>
                           <Link
                             theme={"primary"}
                             prefixIcon={<LogoutIcon/>}
