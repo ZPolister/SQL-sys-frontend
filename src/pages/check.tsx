@@ -29,6 +29,7 @@ const toDateString = (dt: Date) => {
 export default function Check() {
   const [latestReminder, setLatestReminder] = useState<any>(null);
   const [records, setRecords] = useState<any[]>([]);
+  const [editId, setEditID] = useState<number>();
   const [pagination, setPagination] = useState({
     pageNum: 1,
     pageSize: 10,
@@ -109,11 +110,11 @@ export default function Check() {
 
   const handleEdit = (record: any) => {
     setEditData({
-      reminderId: record.reminderId,
       checkFrequencyDays: record.checkFrequencyDays,
       scheduledTime: new Date(record.scheduledTime),
       reminderContent: record.reminderContent,
     });
+    setEditID(record.reminderId);
     setVisible(true);
   };
 
@@ -245,7 +246,7 @@ export default function Check() {
         <Table
           data={records}
           columns={columns}
-          rowKey="id"
+          rowKey="reminderId"
           pagination={{
             current: pagination.pageNum,
             pageSize: pagination.pageSize,
@@ -266,7 +267,7 @@ export default function Check() {
       <HealthCheckDialog
         visible={visible}
         editData={editData}
-        reminderId={editData?.reminderId}
+        reminderId={editId}
         onClose={() => {
           setVisible(false);
           setEditData(null);

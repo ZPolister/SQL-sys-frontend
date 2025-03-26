@@ -1,5 +1,5 @@
 import { Dialog, Form, Input, DatePicker, MessagePlugin } from "tdesign-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { $app } from "../../../app/app";
 import { HealthCheckReminderDto, HealthCheckReminder } from "../../../api";
 
@@ -14,11 +14,27 @@ interface Props {
 export default function HealthCheckDialog({ visible, onClose, onSuccess, editData, reminderId }: Props) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<HealthCheckReminderDto>({
-    checkFrequencyDays: editData?.checkFrequencyDays ?? 30,
-    scheduledTime: editData?.scheduledTime ? new Date(editData.scheduledTime) : new Date(),
-    reminderContent: editData?.reminderContent ?? "",
+    checkFrequencyDays: 30,
+    scheduledTime: new Date(),
+    reminderContent: "",
   });
 
+  useEffect(() => {
+    if (visible && editData) {
+      setFormData({
+        checkFrequencyDays: editData.checkFrequencyDays,
+        scheduledTime: editData.scheduledTime ? new Date(editData.scheduledTime) : new Date(),
+        reminderContent: editData.reminderContent,
+      });
+    } else if (visible) {
+      setFormData({
+        checkFrequencyDays: 30,
+        scheduledTime: new Date(),
+        reminderContent: "",
+      });
+    }
+  }, [visible, editData]);
+  
   const handleSubmit = async () => {
     try {
       setLoading(true);
@@ -59,7 +75,7 @@ export default function HealthCheckDialog({ visible, onClose, onSuccess, editDat
       confirmLoading={loading}
     >
       <Form>
-        <Form.FormItem label="提醒内容">
+        <Form.FormItem label="提醒内容" initialData={editData ? editData.reminderContent : ""} >
           <Input
             value={formData.reminderContent}
             onChange={(value) =>
@@ -68,10 +84,9 @@ export default function HealthCheckDialog({ visible, onClose, onSuccess, editDat
             placeholder="请输入提醒内容"
           />
         </Form.FormItem>
-        <Form.FormItem label="体检频率(天)">
+        <Form.FormItem label="体检频率(天)" initialData={editData ? editData.checkFrequencyDays : 30}>
           <Input
-            type="number"
-            value={formData.checkFrequencyDays}
+            // value={formData.checkFrequencyDays}
             onChange={(value) =>
               setFormData({
                 ...formData,
@@ -81,17 +96,16 @@ export default function HealthCheckDialog({ visible, onClose, onSuccess, editDat
             placeholder="请输入体检频率"
           />
         </Form.FormItem>
-        <Form.FormItem label="计划体检时间">
+        <Form.FormItem label="计划体检时间" initialData={editData ? editData.scheduledTime : new Date()}>
           <DatePicker
             value={formData.scheduledTime}
             onChange={(value) =>
               setFormData({
                 ...formData,
-                scheduledTime: value ? new Date(value) : new Date(),
+                scheduledTime: value ? new Date(value.toLocaleString()) : new Date(),
               })
             }
             mode="date"
-            enableTimePicker
           />
         </Form.FormItem>
       </Form>
