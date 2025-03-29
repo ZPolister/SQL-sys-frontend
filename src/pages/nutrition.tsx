@@ -49,7 +49,7 @@ export default function Nutrition() {
 
   useEffect(() => {
     fetchRecords().finally();
-  }, []);
+  }, [dateRange]);
 
   useEffect(() => {
     if (!chartData) return;

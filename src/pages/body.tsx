@@ -44,7 +44,7 @@ export default function BiometricData() {
 
   useEffect(() => {
     fetchRecords().finally();
-  }, []);
+  }, [dateRange]);
 
   useEffect(() => {
     if (!chartData) return;

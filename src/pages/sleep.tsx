@@ -48,7 +48,7 @@ export default function Sleep() {
 
   useEffect(() => {
     fetchRecords().finally();
-  }, []);
+  }, [dateRange]);
 
   useEffect(() => {
     if (!chartData) return;

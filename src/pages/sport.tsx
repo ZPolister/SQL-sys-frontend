@@ -49,7 +49,7 @@ export default function Sport() {
 
   useEffect(() => {
     fetchRecords().finally();
-  }, []);
+  }, [dateRange]);
 
   useEffect(() => {
     if (!chartData) return;
