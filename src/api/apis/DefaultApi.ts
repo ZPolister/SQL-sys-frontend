@@ -203,6 +203,14 @@ export interface PostMedicationReminderRequest {
     medicationReminderDto?: MedicationReminderDto;
 }
 
+export interface PostMedicationReminderBatchRequest {
+    medicationReminderDto?: Array<MedicationReminderDto>;
+}
+
+export interface PostMedicationReminderPngOperationRequest {
+    postMedicationReminderPngRequest?: PostMedicationReminderPngRequest;
+}
+
 export interface PostSleepRequest {
     sleepLogDto?: SleepLogDto;
 }
@@ -222,7 +230,7 @@ export interface PutMedicationReminderReminderIdRequest {
 }
 
 /**
- *
+ * 
  */
 export class DefaultApi extends runtime.BaseAPI {
 
@@ -1244,6 +1252,34 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * 
+     * 获取下次最近服药时间的提醒
+     */
+    async getMedicationReminderNextRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseResultListMedicationReminder>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/medication-reminder/next`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseResultListMedicationReminderFromJSON(jsonValue));
+    }
+
+    /**
+     * 
+     * 获取下次最近服药时间的提醒
+     */
+    async getMedicationReminderNext(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResultListMedicationReminder> {
+        const response = await this.getMedicationReminderNextRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
      * 返回指定时间范围内每天的睡眠时长数据，用于生成柱状图，所对应的地址：https://echarts.apache.org/examples/zh/editor.html?c=bar-tick-align
      * 获取每日睡眠时长数据
      */
@@ -1667,6 +1703,68 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async postMedicationReminder(requestParameters: PostMedicationReminderRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResultVoid> {
         const response = await this.postMedicationReminderRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * 
+     * 批量创建服药提醒
+     */
+    async postMedicationReminderBatchRaw(requestParameters: PostMedicationReminderBatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseResultVoid>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/medication-reminder/batch`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: requestParameters['medicationReminderDto']!.map(MedicationReminderDtoToJSON),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseResultVoidFromJSON(jsonValue));
+    }
+
+    /**
+     * 
+     * 批量创建服药提醒
+     */
+    async postMedicationReminderBatch(requestParameters: PostMedicationReminderBatchRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResultVoid> {
+        const response = await this.postMedicationReminderBatchRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * 
+     * 通过图片识别服药信息
+     */
+    async postMedicationReminderPngRaw(requestParameters: PostMedicationReminderPngOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseResultListMedicationReminderVo>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/medication-reminder/png`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PostMedicationReminderPngRequestToJSON(requestParameters['postMedicationReminderPngRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseResultListMedicationReminderVoFromJSON(jsonValue));
+    }
+
+    /**
+     * 
+     * 通过图片识别服药信息
+     */
+    async postMedicationReminderPng(requestParameters: PostMedicationReminderPngOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResultListMedicationReminderVo> {
+        const response = await this.postMedicationReminderPngRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
