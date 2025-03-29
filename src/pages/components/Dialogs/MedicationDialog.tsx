@@ -1,5 +1,5 @@
-import { Dialog, Input, InputNumber, DatePicker, TimePicker, MessagePlugin } from "tdesign-react";
-import { useState, useEffect } from "react";
+import { Dialog, Input, InputNumber, DatePicker, TimePicker, MessagePlugin, Upload, Button, UploadFile } from "tdesign-react";
+import { useState, useEffect, useRef } from "react";
 import { MedicationReminderDto, MedicationReminder } from "../../../api";
 import { $app } from "../../../app/app";
 
@@ -11,6 +11,8 @@ interface MedicationDialogProps {
 }
 
 export default function MedicationDialog({ visible, onClose, onSuccess, initialData }: MedicationDialogProps) {
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState<MedicationReminderDto & { reminderTimes: string[] }>({
     medicationName: "",
     medicationDosage: "",
@@ -87,8 +89,7 @@ export default function MedicationDialog({ visible, onClose, onSuccess, initialD
       return;
     }
     if (formData.reminderTimes.length === 0) {      await MessagePlugin.error("提醒时间不能为空");
-      return;
-    }
+      return;    }
 
     const api = $app.$DefaultApi;
     try {
@@ -136,6 +137,38 @@ export default function MedicationDialog({ visible, onClose, onSuccess, initialD
     }
   };
 
+  const handleUpload = async (file: File) => {
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const result = await $app.$DefaultApi.postMedicationReminderPng(formData);
+
+      console.log('处方/说明书识别结果:', result);
+
+      if (result.code === 200 && result.data) {
+        await MessagePlugin.success('识别成功');
+        // 如果需要，可以将识别结果填充到表单中
+        if (result.data.medicationName) {
+          setFormData(prev => ({
+            ...prev,
+            medicationName: result.data.medicationName
+          }));
+        }
+      } else {
+        await MessagePlugin.error(result.msg || '识别失败');
+      }
+    } catch (error) {
+      console.error('上传失败:', error);
+      await MessagePlugin.error('上传失败，请重试');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <Dialog
       visible={visible}
@@ -143,6 +176,34 @@ export default function MedicationDialog({ visible, onClose, onSuccess, initialD
       header={initialData ? "编辑服药提醒" : "新增服药提醒"}
       confirmBtn="提交"
       onConfirm={handleSubmit}
+      footer={
+        <div className="flex justify-between items-center w-full">
+          <div>
+            {!initialData && (
+              <Upload
+                accept="image/*"
+                theme="custom"
+                autoUpload={false}
+                disabled={uploading}
+                onChange={(files) => {
+                  const file = files[0]?.raw;
+                  if (file) {
+                    handleUpload(file).finally();
+                  }
+                }}
+              >
+                <Button loading={uploading} variant="outline" style={{ width: '120px' }}>
+                  {uploading ? '识别中...' : '上传处方图片识别'}
+                </Button>
+              </Upload>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <Button theme="default" onClick={onClose}>取消</Button>
+            <Button theme="primary" loading={uploading} onClick={handleSubmit}>提交</Button>
+          </div>
+        </div>
+      }
     >
       <div className="space-y-6">
         <div className="flex items-center">
@@ -222,6 +283,7 @@ export default function MedicationDialog({ visible, onClose, onSuccess, initialD
             className="flex-1"
           />
         </div>
+
       </div>
     </Dialog>
   );

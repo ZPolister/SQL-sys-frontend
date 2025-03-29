@@ -1743,19 +1743,19 @@ export class DefaultApi extends runtime.BaseAPI {
      * 
      * 通过图片识别服药信息
      */
-    async postMedicationReminderPngRaw(requestParameters: PostMedicationReminderPngOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseResultListMedicationReminderVo>> {
+    async postMedicationReminderPngRaw(requestParameters: FormData, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseResultListMedicationReminderVo>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json';
+        // headerParameters['Content-Type'] = 'multipart/form-data';
 
         const response = await this.request({
             path: `/medication-reminder/png`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: PostMedicationReminderPngRequestToJSON(requestParameters['postMedicationReminderPngRequest']),
+            body: requestParameters,
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ResponseResultListMedicationReminderVoFromJSON(jsonValue));
@@ -1765,7 +1765,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * 
      * 通过图片识别服药信息
      */
-    async postMedicationReminderPng(requestParameters: PostMedicationReminderPngOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResultListMedicationReminderVo> {
+    async postMedicationReminderPng(requestParameters: FormData, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseResultListMedicationReminderVo> {
         const response = await this.postMedicationReminderPngRaw(requestParameters, initOverrides);
         return await response.value();
     }
