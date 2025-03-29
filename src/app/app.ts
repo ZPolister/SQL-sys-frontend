@@ -6,7 +6,10 @@ import {MessagePlugin} from "tdesign-react";
 export class HealthApp extends EventTarget {
   $DefaultApi: DefaultApi;
   $SystemControllerApi: SystemControllerApi;
+  $isDarkTheme: boolean = false;
   private autoTheme: boolean = true;
+  private themeChangeListeners: Array<(isDark: boolean) => void> = [];
+  
   
   apiConfig: Configuration;
 
@@ -47,12 +50,43 @@ export class HealthApp extends EventTarget {
    * @param auto 是否自动跟随系统
    */
   setTheme(theme: 'dark' | 'light', auto: boolean = true) {
+    const oldValue = this.$isDarkTheme;
     if (theme === 'dark') {
+      this.$isDarkTheme = true;
+      console.log('[HealthApp] 设置主题为深色' + this.$isDarkTheme);
       document.documentElement.setAttribute('theme-mode', 'dark')
     } else {
+      this.$isDarkTheme = false;
+      console.log('[HealthApp] 设置主题为浅色' + this.$isDarkTheme);
       document.documentElement.removeAttribute('theme-mode');
     }
     this.autoTheme = auto;
+    
+    // 如果主题发生了变化，通知所有监听器
+    if (oldValue !== this.$isDarkTheme) {
+      this.notifyThemeChangeListeners();
+    }
+  }
+  
+  /**
+   * 添加主题变化监听器
+   * @param listener 监听函数，接收一个布尔值参数表示是否为深色主题
+   * @returns 用于移除监听器的函数
+   */
+  addThemeChangeListener(listener: (isDark: boolean) => void): () => void {
+    this.themeChangeListeners.push(listener);
+    return () => {
+      this.themeChangeListeners = this.themeChangeListeners.filter(l => l !== listener);
+    };
+  }
+  
+  /**
+   * 通知所有主题变化监听器
+   */
+  private notifyThemeChangeListeners() {
+    for (const listener of this.themeChangeListeners) {
+      listener(this.$isDarkTheme);
+    }
   }
 
   /**

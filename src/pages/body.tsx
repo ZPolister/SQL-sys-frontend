@@ -7,7 +7,6 @@ import {
 import {useEffect, useState} from "react";
 import * as echarts from "echarts";
 import {
-  BiometricRecordDto,
   BiometricRecordVo,
   ResponseResultPageBiometricRecordVo,
 } from "../api";
@@ -38,15 +37,6 @@ export default function BiometricData() {
     toDateString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
     toDateString(new Date()),
   ]);
-  const [formData, setFormData] = useState<BiometricRecordDto>({
-    heightCm: 0,
-    weightKg: 0,
-    systolicPressure: 0,
-    diastolicPressure: 0,
-    bloodGlucose: 0,
-    bloodLipid: 0,
-    measurementTime: new Date().getTime(),
-  });
 
   useEffect(() => {
     fetchChartData().finally();
@@ -57,17 +47,32 @@ export default function BiometricData() {
   }, []);
 
   useEffect(() => {
-    if (chartData) {
-      const chart = renderChart();
-      const handleResize = () => {
-        chart?.resize();
-      };
-      window.addEventListener("resize", handleResize);
-      return () => {
-        window.removeEventListener("resize", handleResize);
-        chart?.dispose();
-      };
-    }
+    if (!chartData) return;
+
+    // 获取或创建图表实例
+    const chart = renderChart();
+    if (!chart) return;
+
+    // 处理窗口大小变化
+    const handleResize = () => {
+      chart.resize();
+    };
+    window.addEventListener("resize", handleResize);
+
+    // 处理主题变化
+    const removeThemeListener = $app.addThemeChangeListener((isDark) => {
+      console.log("主题变化，当前是否深色:", isDark);
+      // 重新设置图表主题
+      chart.dispose();
+      renderChart();
+    });
+
+    // 清理函数
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      removeThemeListener();
+      chart.dispose();
+    };
   }, [chartData]);
 
   const fetchChartData = async () => {
@@ -99,8 +104,14 @@ export default function BiometricData() {
   const renderChart = (): echarts.ECharts | undefined => {
     const chartDom = document.getElementById("biometric-chart");
     if (chartDom) {
-      const myChart = echarts.init(chartDom);
+      // 确保在初始化新图表之前清理掉旧的图表实例
+      const existingChart = echarts.getInstanceByDom(chartDom);
+      if (existingChart) {
+        existingChart.dispose();
+      }
+      const myChart = echarts.init(chartDom, $app.$isDarkTheme ? "dark" : "light");
       const option = {
+        backgroundColor: "",
         tooltip: {trigger: "axis"},
         legend: {
           data: ["体重", "收缩压", "舒张压", "血糖", "血脂", "BMI"],
@@ -350,7 +361,7 @@ export default function BiometricData() {
                   theme="danger"
                   variant="text"
                   size="small"
-                  onClick={() => handleDelete(row.recordId)}
+                  onClick={() => handleDelete(row.recordId as number)}
                 >
                   删除
                 </Button>
