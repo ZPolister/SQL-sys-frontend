@@ -49,20 +49,34 @@ export default function Sport() {
 
   useEffect(() => {
     fetchRecords().finally();
-  }, []);
+  }, [dateRange]);
 
   useEffect(() => {
-    if (chartData) {
-      const chart = renderChart();
-      const handleResize = () => {
-        chart?.resize();
-      };
-      window.addEventListener("resize", handleResize);
-      return () => {
-        window.removeEventListener("resize", handleResize);
-        chart?.dispose();
-      };
-    }
+    if (!chartData) return;
+
+    // 获取或创建图表实例
+    const chart = renderChart();
+    if (!chart) return;
+
+    // 处理窗口大小变化
+    const handleResize = () => {
+      chart.resize();
+    };
+    window.addEventListener("resize", handleResize);
+
+    // 处理主题变化
+    const removeThemeListener = $app.addThemeChangeListener((isDark) => {
+      // console.log("主题变化，当前是否深色:", isDark);
+      chart.dispose();
+      renderChart();
+    });
+
+    // 清理函数
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      removeThemeListener();
+      chart.dispose();
+    };
   }, [chartData]);
 
   const fetchChartData = async () => {
@@ -91,8 +105,14 @@ export default function Sport() {
   const renderChart = (): echarts.ECharts | undefined => {
     const chartDom = document.getElementById("sport-chart");
     if (chartDom && chartData) {
-      const myChart = echarts.init(chartDom);
+      // 确保在初始化新图表之前清理掉旧的图表实例
+      const existingChart = echarts.getInstanceByDom(chartDom);
+      if (existingChart) {
+        existingChart.dispose();
+      }
+      const myChart = echarts.init(chartDom, $app.$isDarkTheme ? "dark" : "light");
       const option = {
+        backgroundColor: "",
         tooltip: { trigger: "axis" },
         legend: {
           data: ["每日消耗"],
