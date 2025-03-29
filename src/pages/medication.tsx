@@ -48,14 +48,6 @@ export default function Medication() {
     fetchRecords().finally();
   }, [dateRange]);
 
-  useEffect(() => {
-    if (currentReminder) {
-      setVisible(true);
-    } else {
-      setVisible(false);
-    }
-  }, [currentReminder]);
-
   const fetchRecentReminders = async () => {
     const api = $app.$DefaultApi;
     try {
@@ -193,7 +185,7 @@ export default function Medication() {
           </div>
           <Button theme="primary" onClick={() => {
             setCurrentReminder(undefined);
-            // setVisible(true);
+            setVisible(true);
           }}>
             新增提醒
           </Button>
@@ -244,12 +236,27 @@ export default function Medication() {
               align: "center",
               width: 200,
               ellipsis: true,
-              title: "备注",
-              colKey: "notes",
+              title: "提醒时间",
+              colKey: "reminderTime",
+              cell: ({ row }) => {
+                try {
+                  const times = JSON.parse(row.reminderTime || "[]");
+                  return Array.isArray(times) ? times.join(", ") : times;
+                } catch (e) {
+                  return row.reminderTime;
+                }
+              }
             },
             {
               align: "center",
-              width: 100,
+              width: 60,
+              ellipsis: true,
+              title: "已服用次数",
+              colKey: "reminderCount",
+            },
+            {
+              align: "center",
+              width: 80,
               ellipsis: true,
               title: "状态",
               colKey: "status",
@@ -271,7 +278,7 @@ export default function Medication() {
                     size="small"
                     onClick={() => {
                       setCurrentReminder(row as MedicationReminder);
-                      // setVisible(true);
+                      setVisible(true);
                     }}
                   >
                     编辑

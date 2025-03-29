@@ -1,8 +1,7 @@
-import { Dialog, Form, Input, InputNumber, DatePicker, TimePicker, MessagePlugin } from "tdesign-react";
+import { Dialog, Input, InputNumber, DatePicker, TimePicker, MessagePlugin } from "tdesign-react";
 import { useState, useEffect } from "react";
 import { MedicationReminderDto, MedicationReminder } from "../../../api";
 import { $app } from "../../../app/app";
-import FormItem from "tdesign-react/es/form/FormItem";
 
 interface MedicationDialogProps {
   visible: boolean;
@@ -12,7 +11,6 @@ interface MedicationDialogProps {
 }
 
 export default function MedicationDialog({ visible, onClose, onSuccess, initialData }: MedicationDialogProps) {
-  const [form] = Form.useForm();
   const [formData, setFormData] = useState<MedicationReminderDto & { reminderTimes: string[] }>({
     medicationName: "",
     medicationDosage: "",
@@ -52,7 +50,6 @@ export default function MedicationDialog({ visible, onClose, onSuccess, initialD
         reminderTimes: ["08:00"],
       });
     }
-    form.reset();
   }, [visible, initialData]);
   // 当服药频率改变时，调整时间数组长度
   useEffect(() => {
@@ -89,8 +86,7 @@ export default function MedicationDialog({ visible, onClose, onSuccess, initialD
       await MessagePlugin.error("药品剂量不能为空");
       return;
     }
-    if (formData.reminderTimes.length === 0) {
-      await MessagePlugin.error("提醒时间不能为空");
+    if (formData.reminderTimes.length === 0) {      await MessagePlugin.error("提醒时间不能为空");
       return;
     }
 
@@ -148,48 +144,74 @@ export default function MedicationDialog({ visible, onClose, onSuccess, initialD
       confirmBtn="提交"
       onConfirm={handleSubmit}
     >
-      <Form>
-        <FormItem label="药品名称" required initialData={formData.medicationName}>
+      <div className="space-y-6">
+        <div className="flex items-center">
+          <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>
+            药品名称
+            <span style={{ color: 'var(--td-error-color)' }} className="ml-0.5">*</span>
+          </label>
           <Input
-            placeholder="请输入药品名称"
+            value={formData.medicationName}
             onChange={(val) => setFormData({ ...formData, medicationName: val as string })}
+            placeholder="请输入药品名称"
+            className="flex-1"
           />
-        </FormItem>
-        <FormItem label="药品剂量" required initialData={formData.medicationDosage}>
+        </div>
+
+        <div className="flex items-center">
+          <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>
+            药品剂量
+            <span style={{ color: 'var(--td-error-color)' }} className="ml-0.5">*</span>
+          </label>
           <Input
-            placeholder="如: 5mg/片, 2片/次"
+            value={formData.medicationDosage}
             onChange={(val) => setFormData({ ...formData, medicationDosage: val as string })}
+            placeholder="如: 5mg/片, 2片/次"
+            className="flex-1"
           />
-        </FormItem>
-        <FormItem label="每日服药次数" initialData={formData.medicationFrequency}>
+        </div>
+
+        <div className="flex items-center">
+          <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>每日服药次数</label>
           <InputNumber
+            value={formData.medicationFrequency}
+            onChange={(val) => setFormData({ ...formData, medicationFrequency: val as number })}
             min={1}
             max={10}
-            onChange={(val) => setFormData({ ...formData, medicationFrequency: val as number })}
+            className="flex-1"
           />
-        </FormItem>
-        <FormItem label="服药持续天数" initialData={formData.medicationDuration}>
+        </div>
+
+        <div className="flex items-center">
+          <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>服药持续天数</label>
           <InputNumber
+            value={formData.medicationDuration}
+            onChange={(val) => setFormData({ ...formData, medicationDuration: val as number })}
             min={1}
             max={365}
-            onChange={(val) => setFormData({ ...formData, medicationDuration: val as number })}
+            className="flex-1"
           />
-        </FormItem>
+        </div>
+
         {formData.reminderTimes.map((time, index) => (
-          <FormItem
-            key={index}
-            label={formData.medicationFrequency > 1 ? `提醒时间 ${index + 1}` : "提醒时间"}
-            required
-            initialData={time}
-          >
+          <div key={index} className="flex items-center">
+            <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>
+              {formData.medicationFrequency > 1 ? `提醒时间 ${index + 1}` : "提醒时间"}
+              <span style={{ color: 'var(--td-error-color)' }} className="ml-0.5">*</span>
+            </label>
             <TimePicker
+              value={time}
               format="HH:mm"
               onChange={(val) => handleTimeChange(val as string, index)}
+              className="flex-1"
             />
-          </FormItem>
+          </div>
         ))}
-        <FormItem label="开始服药时间" initialData={formData.startTime}>
+
+        <div className="flex items-center">
+          <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>开始服药时间</label>
           <DatePicker
+            value={formData.startTime}
             mode="date"
             format="YYYY-MM-DD"
             onChange={(val) => {
@@ -197,9 +219,10 @@ export default function MedicationDialog({ visible, onClose, onSuccess, initialD
                 setFormData({ ...formData, startTime: new Date(val) });
               }
             }}
+            className="flex-1"
           />
-        </FormItem>
-      </Form>
+        </div>
+      </div>
     </Dialog>
   );
 }
