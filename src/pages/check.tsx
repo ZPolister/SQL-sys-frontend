@@ -29,7 +29,7 @@ const toDateString = (dt: Date) => {
 export default function Check() {
   const [latestReminder, setLatestReminder] = useState<any>(null);
   const [records, setRecords] = useState<any[]>([]);
-  const [editId, setEditID] = useState<number>();
+  const [editId, setEditID] = useState<number | null>();
   const [pagination, setPagination] = useState({
     pageNum: 1,
     pageSize: 10,
@@ -154,7 +154,7 @@ export default function Check() {
       colKey: "scheduledTime",
       cell: ({ row }: any) => {
         const date = new Date(row.scheduledTime);
-        return date.toLocaleString();
+        return date.toLocaleDateString();
       },
     },
     {
@@ -193,7 +193,10 @@ export default function Check() {
       <Card
         title="最近体检提醒"
         actions={
-          <Button theme="primary" icon={<CalendarIcon />} onClick={() => setVisible(true)}>
+          <Button theme="primary" icon={<CalendarIcon />} onClick={() => {
+            setEditID(null);
+            setVisible(true);
+            }}>
             新增体检提醒
           </Button>
         }
@@ -271,9 +274,11 @@ export default function Check() {
         onClose={() => {
           setVisible(false);
           setEditData(null);
+          setEditID(null);
         }}
         onSuccess={() => {
           setVisible(false);
+          setEditID(null);
           setEditData(null);
           fetchRecords().finally();
           fetchLatestReminder().finally();

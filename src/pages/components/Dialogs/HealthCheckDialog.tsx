@@ -1,7 +1,7 @@
-import { Dialog, Form, Input, DatePicker, MessagePlugin } from "tdesign-react";
+import { Dialog, Input, DatePicker, MessagePlugin, Button, InputNumber } from "tdesign-react";
 import { useState, useEffect } from "react";
 import { $app } from "../../../app/app";
-import { HealthCheckReminderDto, HealthCheckReminder } from "../../../api";
+import { HealthCheckReminderDto } from "../../../api";
 
 interface Props {
   visible: boolean;
@@ -36,6 +36,20 @@ export default function HealthCheckDialog({ visible, onClose, onSuccess, editDat
   }, [visible, editData]);
   
   const handleSubmit = async () => {
+    // 表单验证
+    if (!formData.reminderContent) {
+      await MessagePlugin.error("提醒内容不能为空");
+      return;
+    }
+    if (!formData.checkFrequencyDays || formData.checkFrequencyDays < 1) {
+      await MessagePlugin.error("请输入有效的体检频率");
+      return;
+    }
+    if (!formData.scheduledTime) {
+      await MessagePlugin.error("请选择计划体检时间");
+      return;
+    }
+
     try {
       setLoading(true);
       const api = $app.$DefaultApi;
@@ -54,13 +68,15 @@ export default function HealthCheckDialog({ visible, onClose, onSuccess, editDat
         });
       }
       if (result.code === 200) {
-        await MessagePlugin.success("添加成功");
+        await MessagePlugin.success(reminderId ? "更新成功" : "添加成功");
         onSuccess();
         onClose();
+      } else {
+        await MessagePlugin.error(result.msg || (reminderId ? "更新失败" : "添加失败"));
       }
     } catch (error) {
       console.error(error);
-      await MessagePlugin.error("添加失败");
+      await MessagePlugin.error("操作失败，请检查网络连接");
     } finally {
       setLoading(false);
     }
@@ -71,44 +87,63 @@ export default function HealthCheckDialog({ visible, onClose, onSuccess, editDat
       header={editData ? "编辑体检提醒" : "新增体检提醒"}
       visible={visible}
       onClose={onClose}
-      onConfirm={handleSubmit}
-      confirmLoading={loading}
+      width={500}
+      footer={
+        <div className="flex justify-end gap-2">
+          <Button theme="default" onClick={onClose}>取消</Button>
+          <Button theme="primary" loading={loading} onClick={handleSubmit}>
+            {editData ? "更新" : "添加"}
+          </Button>
+        </div>
+      }
     >
-      <Form>
-        <Form.FormItem label="提醒内容" initialData={editData ? editData.reminderContent : ""} >
+      <div className="space-y-6 p-2">
+        <div className="flex items-center">
+          <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>
+            提醒内容
+            <span style={{ color: 'var(--td-error-color)' }} className="ml-0.5">*</span>
+          </label>
           <Input
             value={formData.reminderContent}
-            onChange={(value) =>
-              setFormData({ ...formData, reminderContent: String(value) })
-            }
+            onChange={(value) => setFormData({ ...formData, reminderContent: String(value) })}
             placeholder="请输入提醒内容"
+            className="flex-1"
           />
-        </Form.FormItem>
-        <Form.FormItem label="体检频率(天)" initialData={editData ? editData.checkFrequencyDays : 30}>
-          <Input
-            // value={formData.checkFrequencyDays}
-            onChange={(value) =>
-              setFormData({
-                ...formData,
-                checkFrequencyDays: Number(value),
-              })
-            }
+        </div>
+
+        <div className="flex items-center">
+          <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>
+            体检频率(天)
+            <span style={{ color: 'var(--td-error-color)' }} className="ml-0.5">*</span>
+          </label>
+          <InputNumber
+            value={formData.checkFrequencyDays}
+            onChange={(value) => setFormData({ ...formData, checkFrequencyDays: Number(value) })}
+            min={1}
+            max={365}
+            className="flex-1"
             placeholder="请输入体检频率"
           />
-        </Form.FormItem>
-        <Form.FormItem label="计划体检时间" initialData={editData ? editData.scheduledTime : new Date()}>
+        </div>
+
+        <div className="flex items-center">
+          <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>
+            计划体检时间
+            <span style={{ color: 'var(--td-error-color)' }} className="ml-0.5">*</span>
+          </label>
           <DatePicker
             value={formData.scheduledTime}
-            onChange={(value) =>
-              setFormData({
-                ...formData,
-                scheduledTime: value ? new Date(value.toLocaleString()) : new Date(),
-              })
-            }
+            onChange={(value) => setFormData({
+              ...formData,
+              scheduledTime: value ? new Date(value as any) : new Date(),
+            })}
             mode="date"
+            format="YYYY-MM-DD"
+            className="flex-1"
+            placeholder="请选择计划体检时间"
           />
-        </Form.FormItem>
-      </Form>
+        </div>
+      </div>
     </Dialog>
   );
 }
