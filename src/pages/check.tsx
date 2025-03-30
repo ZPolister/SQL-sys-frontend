@@ -6,6 +6,9 @@ import {
   MessagePlugin,
   Popconfirm,
   Space,
+  Statistic,
+  Row,
+  Col,
 } from "tdesign-react";
 import { useEffect, useState } from "react";
 import { $app } from "../app/app";
@@ -38,9 +41,9 @@ export default function Check() {
   const [visible, setVisible] = useState(false);
   const [editData, setEditData] = useState<HealthCheckReminderDto | null>(null);
   // 设置默认时间范围为今天到一年后
-  const [dateRange, setDateRange] = useState<[Date, Date]>([
-    new Date(),
-    new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+  const [dateRange, setDateRange] = useState<[string, string]>([
+    toDateString(new Date()),
+    toDateString(new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)),
   ]);
 
   useEffect(() => {
@@ -118,28 +121,6 @@ export default function Check() {
     setVisible(true);
   };
 
-  const handleUpdateSuccess = async (id: number) => {
-    try {
-      if (!editData) return;
-
-      const api = $app.$DefaultApi;
-      const result = await api.putHealthCheckReminderId({
-        id,
-        healthCheckReminderDto: editData,
-      });
-
-      if (result.code === 200) {
-        await MessagePlugin.success("更新成功");
-        setEditData(null);
-        await fetchRecords();
-        await fetchLatestReminder();
-      }
-    } catch (error) {
-      console.error("更新失败", error);
-      await MessagePlugin.error("更新失败");
-    }
-  };
-
   const columns = [
     {
       title: "提醒内容",
@@ -196,24 +177,33 @@ export default function Check() {
           <Button theme="primary" icon={<CalendarIcon />} onClick={() => {
             setEditID(null);
             setVisible(true);
-            }}>
+          }}>
             新增体检提醒
           </Button>
         }
         className="mb-6"
       >
         {latestReminder ? (
-          <div className="p-4">
-            <h3 className="text-lg font-semibold mb-2">{latestReminder.reminderContent}</h3>
-            <p className="text-gray-600">
-              <span className="font-medium">计划体检时间：</span>
-              {new Date(latestReminder.scheduledTime).toLocaleString()}
-            </p>
-            <p className="text-gray-600">
-              <span className="font-medium">体检频率：</span>
-              {latestReminder.checkFrequencyDays} 天
-            </p>
-          </div>
+          <Row gutter={[16, 16]}> 
+            <Col span={8}> 
+              <Statistic
+                title="提醒内容"
+                value={latestReminder.reminderContent}
+              />
+            </Col>
+            <Col span={8}> 
+              <Statistic
+                title="计划体检时间"
+                value={new Date(latestReminder.scheduledTime).toLocaleDateString() as any}
+              />
+            </Col>
+            <Col span={8}> 
+              <Statistic
+                title="体检频率"
+                value={`${latestReminder.checkFrequencyDays} 天` as any}
+              />
+            </Col>
+          </Row>
         ) : (
           <div className="p-4 text-center text-gray-500">
             暂无体检提醒，请点击右上角添加
@@ -230,7 +220,8 @@ export default function Check() {
               value={dateRange}
               onChange={(value) => {
                 if (Array.isArray(value) && value.length === 2) {
-                  setDateRange([new Date(value[0]), new Date(value[1])]);
+                  setDateRange([toDateString(new Date(value[0])), 
+                                toDateString(new Date(value[1]))]);
                 }
               }}
               mode="date"
