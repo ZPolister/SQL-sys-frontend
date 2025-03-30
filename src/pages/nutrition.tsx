@@ -49,7 +49,7 @@ export default function Nutrition() {
     total: 0,
   });
   const [visible, setVisible] = useState(false);
-  const [timeRange, setTimeRange] = useState<string>("WEEK");
+  const [timeRange, setTimeRange] = useState<string>("week");
   // 设置默认时间范围为最近30天
   const [dateRange, setDateRange] = useState<[string, string]>([
     toDateString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
@@ -193,33 +193,33 @@ export default function Nutrition() {
         actions={
           <div className="flex gap-2">
             <Button
-              variant={timeRange === "WEEK" ? "base" : "outline"}
+              variant={timeRange === "week" ? "base" : "outline"}
               onClick={() => {
-                setTimeRange("WEEK");
+                setTimeRange("week");
               }}
             >
               近一周
             </Button>
             <Button
-              variant={timeRange === "MONTH" ? "base" : "outline"}
+              variant={timeRange === "month" ? "base" : "outline"}
               onClick={() => {
-                setTimeRange("MONTH");
+                setTimeRange("month");
               }}
             >
               近一月
             </Button>
             <Button
-              variant={timeRange === "THREE_MONTHS" ? "base" : "outline"}
+              variant={timeRange === "3months" ? "base" : "outline"}
               onClick={() => {
-                setTimeRange("THREE_MONTHS");
+                setTimeRange("3months");
               }}
             >
               近三月
             </Button>
             <Button
-              variant={timeRange === "HALF_YEAR" ? "base" : "outline"}
+              variant={timeRange === "6months" ? "base" : "outline"}
               onClick={() => {
-                setTimeRange("HALF_YEAR");
+                setTimeRange("6months");
               }}
             >
               近半年
