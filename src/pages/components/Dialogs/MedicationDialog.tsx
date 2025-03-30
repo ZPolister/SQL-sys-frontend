@@ -301,7 +301,7 @@ export default function MedicationDialog({ visible, onClose, onSuccess, initialD
               format="YYYY-MM-DD"
               onChange={(val) => {
                 if (val) {
-                  setFormData({ ...formData, startTime: new Date(val) });
+                  setFormData({ ...formData, startTime: new Date(val as any) });
                 }
               }}
               className="flex-1"

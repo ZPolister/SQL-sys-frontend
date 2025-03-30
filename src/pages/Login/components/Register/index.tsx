@@ -8,9 +8,10 @@ import {
   FormInstanceFunctions,
   Input,
   MessagePlugin,
-  SubmitContext
+  SubmitContext,
+  DatePicker
 } from 'tdesign-react';
-import {BrowseIcon, BrowseOffIcon, LockOnIcon, MailIcon, UserIcon, VerifyIcon} from 'tdesign-icons-react';
+import {BrowseIcon, BrowseOffIcon, CakeIcon, LockOnIcon, MailIcon, UserIcon, VerifyIcon} from 'tdesign-icons-react';
 import useCountdown from '../../hooks/useCountDown';
 
 import Style from './index.module.less';
@@ -28,7 +29,7 @@ export default function Register(
 
   const handleRegister = () => {
     const formValue = formRef.current?.getFieldsValue?.(true) || {};
-    $app.register(formValue.username, formValue.password, formValue.email, formValue.code)
+    $app.register(formValue.username, formValue.password, formValue.email, formValue.code, formValue.birthday)
       .then(() => {
         handleSwitchLoginType()
       })
@@ -43,9 +44,9 @@ export default function Register(
           body: (
             <>
               <span>我已阅读并同意</span>
-              <span className='tip'>&nbsp;TTXX服务协议&nbsp;</span>
+              <span className='tip'>&nbsp;服务协议&nbsp;</span>
               和
-              <span className='tip'>&nbsp;TTXX隐私声明&nbsp;</span>
+              <span className='tip'>&nbsp;隐私声明&nbsp;</span>
             </>
           ),
           confirmBtn: {
@@ -81,8 +82,8 @@ export default function Register(
       MessagePlugin.error('请先填写邮箱地址').finally();
       return;
     }
+    $app.sendEmailCode(email);
     setupCountdown();
-    $app.sendEmailCode(email)
   };
 
   return (
@@ -167,14 +168,29 @@ export default function Register(
         </FormItem>
 
         <FormItem
+          name="birthday"
+          rules={[
+            {required: true, message: '生日必填'},
+          ]}
+        >
+          <DatePicker
+            prefixIcon={<CakeIcon/>}
+            size='large'
+            placeholder='请选择生日'
+            format='YYYY-MM-DD'
+            style={{width: '100%'}}
+          />
+        </FormItem>
+
+        <FormItem
           className={Style.checkContainer}
           name='checked'
           initialData={false}
         >
           <Checkbox>我已阅读并同意</Checkbox>
-          <span className='tip'>&nbsp;TTXX服务协议&nbsp;</span>
+          <span className='tip'>&nbsp;服务协议&nbsp;</span>
           和
-          <span className='tip'>&nbsp;TTXX隐私声明&nbsp;</span>
+          <span className='tip'>&nbsp;隐私声明&nbsp;</span>
         </FormItem>
 
         <FormItem>

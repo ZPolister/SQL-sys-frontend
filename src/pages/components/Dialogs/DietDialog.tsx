@@ -65,7 +65,7 @@ export default function DietDialog({ visible, onClose, onSuccess }: DietDialogPr
           <InputNumber
             value={formData.quantityGrams}
             onChange={(val) =>
-              setFormData({ ...formData, quantityGrams: val })
+              setFormData({ ...formData, quantityGrams: val as any })
             }
           />
         </Form.FormItem>
@@ -73,7 +73,7 @@ export default function DietDialog({ visible, onClose, onSuccess }: DietDialogPr
           <InputNumber
             value={formData.totalCalories}
             onChange={(val) =>
-              setFormData({ ...formData, totalCalories: val })
+              setFormData({ ...formData, totalCalories: val as any })
             }
           />
         </Form.FormItem>
@@ -88,7 +88,7 @@ export default function DietDialog({ visible, onClose, onSuccess }: DietDialogPr
             }
             onChange={(val) => {
               if (val) {
-                const date = new Date(val);
+                const date = new Date(val as any);
                 setFormData({ ...formData, consumptionTime: date.getTime() });
               }
             }}

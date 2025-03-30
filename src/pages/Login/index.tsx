@@ -1,9 +1,10 @@
-import React, {memo, useState} from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import classNames from 'classnames';
 import Login from './components/Login';
 import Register from './components/Register';
 import Style from './index.module.less';
-import {Link} from "tdesign-react";
+import { Link } from "tdesign-react";
+import { $app } from '../../app/app';
 
 export default memo(() => {
   const [type, setType] = useState('login');
@@ -14,18 +15,7 @@ export default memo(() => {
 
   return (
     <div className={Style.loginWrapper}>
-      <div
-        style={{
-          position: "fixed",
-          left: 0,
-          top: 0,
-          minWidth: "550px",
-          height: "100dvh",
-          background: "rgba(255, 255, 255, 0.9)",
-          backdropFilter: "blur(50px)",
-          boxShadow: "0px 0px 20px 20px rgba(0, 0, 0, 0.15)",
-        }}
-      />
+      <div className={Style.shadowBackground} />
 
       <div className={Style.loginContainer}>
         <div className={Style.titleContainer}>

@@ -66,20 +66,20 @@ export default function BiometricDialog({ visible, onClose, onSuccess }: Biometr
         <Form.FormItem label="身高 (cm)">
           <InputNumber
             value={formData.heightCm}
-            onChange={(val) => setFormData({ ...formData, heightCm: val })}
+            onChange={(val) => setFormData({ ...formData, heightCm: val as any })}
           />
         </Form.FormItem>
         <Form.FormItem label="体重 (kg)">
           <InputNumber
             value={formData.weightKg}
-            onChange={(val) => setFormData({ ...formData, weightKg: val })}
+            onChange={(val) => setFormData({ ...formData, weightKg: val as any })}
           />
         </Form.FormItem>
         <Form.FormItem label="收缩压">
           <InputNumber
             value={formData.systolicPressure}
             onChange={(val) =>
-              setFormData({ ...formData, systolicPressure: val })
+              setFormData({ ...formData, systolicPressure: val as any })
             }
           />
         </Form.FormItem>
@@ -87,7 +87,7 @@ export default function BiometricDialog({ visible, onClose, onSuccess }: Biometr
           <InputNumber
             value={formData.diastolicPressure}
             onChange={(val) =>
-              setFormData({ ...formData, diastolicPressure: val })
+              setFormData({ ...formData, diastolicPressure: val as any })
             }
           />
         </Form.FormItem>
@@ -95,14 +95,14 @@ export default function BiometricDialog({ visible, onClose, onSuccess }: Biometr
           <InputNumber
             value={formData.bloodGlucose}
             onChange={(val) =>
-              setFormData({ ...formData, bloodGlucose: val })
+              setFormData({ ...formData, bloodGlucose: val as any })
             }
           />
         </Form.FormItem>
         <Form.FormItem label="血脂">
           <InputNumber
             value={formData.bloodLipid}
-            onChange={(val) => setFormData({ ...formData, bloodLipid: val })}
+            onChange={(val) => setFormData({ ...formData, bloodLipid: val as any })}
           />
         </Form.FormItem>
         <Form.FormItem label="测量时间">
@@ -116,7 +116,7 @@ export default function BiometricDialog({ visible, onClose, onSuccess }: Biometr
             }
             onChange={(val) => {
               if (val) {
-                const date = new Date(val);
+                const date = new Date(val as any);
                 setFormData({ ...formData, measurementTime: date.getTime() });
               }
             }}

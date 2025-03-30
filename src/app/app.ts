@@ -216,7 +216,7 @@ export class HealthApp extends EventTarget {
       })
   }
 
-  async register(account: string, password: string, email: string, emailCode: string) {
+  async register(account: string, password: string, email: string, emailCode: string, birthday: string) {
     useLoginStore.getState().setState('pending')
 
     try {
@@ -225,6 +225,7 @@ export class HealthApp extends EventTarget {
           username: account,
           password: password,
           email: email,
+          birthday: birthday,
           code: emailCode
         }
       });
