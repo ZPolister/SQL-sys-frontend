@@ -1,7 +1,8 @@
 import { Dialog, Input, InputNumber, DatePicker, TimePicker, MessagePlugin, Upload, Button, UploadFile } from "tdesign-react";
 import { useState, useEffect, useRef } from "react";
-import { MedicationReminderDto, MedicationReminder } from "../../../api";
+import { MedicationReminderDto, MedicationReminder, MedicationReminderVo } from "../../../api";
 import { $app } from "../../../app/app";
+import RecognizedMedicationsDialog from "./RecognizedMedicationsDialog";
 
 interface MedicationDialogProps {
   visible: boolean;
@@ -10,9 +11,19 @@ interface MedicationDialogProps {
   initialData?: MedicationReminder;
 }
 
+const convertVoToDto = (vo: MedicationReminderVo): MedicationReminderDto => {
+  return {
+    medicationName: vo.medicationName || "",
+    medicationDosage: vo.medicationDosage || "",
+    medicationFrequency: vo.medicationFrequency || 1,
+    medicationDuration: vo.medicationDuration || 7,
+    reminderTime: JSON.stringify(["08:00"]), // 默认早上8点
+    startTime: new Date(), // 默认当前时间
+  };
+};
+
 export default function MedicationDialog({ visible, onClose, onSuccess, initialData }: MedicationDialogProps) {
   const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState<MedicationReminderDto & { reminderTimes: string[] }>({
     medicationName: "",
     medicationDosage: "",
@@ -23,6 +34,10 @@ export default function MedicationDialog({ visible, onClose, onSuccess, initialD
     startTime: new Date(),
     reminderTimes: ["08:00"],
   });
+
+  // 识别结果对话框的状态
+  const [recognizedDialogVisible, setRecognizedDialogVisible] = useState(false);
+  const [recognizedMedications, setRecognizedMedications] = useState<MedicationReminderDto[]>([]);
 
   // 重置或设置初始表单数据
   useEffect(() => {
@@ -53,6 +68,7 @@ export default function MedicationDialog({ visible, onClose, onSuccess, initialD
       });
     }
   }, [visible, initialData]);
+
   // 当服药频率改变时，调整时间数组长度
   useEffect(() => {
     const currentTimes = [...formData.reminderTimes];
@@ -88,8 +104,10 @@ export default function MedicationDialog({ visible, onClose, onSuccess, initialD
       await MessagePlugin.error("药品剂量不能为空");
       return;
     }
-    if (formData.reminderTimes.length === 0) {      await MessagePlugin.error("提醒时间不能为空");
-      return;    }
+    if (formData.reminderTimes.length === 0) {      
+      await MessagePlugin.error("提醒时间不能为空");
+      return;    
+    }
 
     const api = $app.$DefaultApi;
     try {
@@ -151,13 +169,17 @@ export default function MedicationDialog({ visible, onClose, onSuccess, initialD
 
       if (result.code === 200 && result.data) {
         await MessagePlugin.success('识别成功');
-        // 如果需要，可以将识别结果填充到表单中
-        if (result.data.medicationName) {
-          setFormData(prev => ({
-            ...prev,
-            medicationName: result.data.medicationName
-          }));
+        
+        // 处理返回的多条药品信息，将 Vo 转换为 Dto
+        if (Array.isArray(result.data)) {
+          const convertedData = result.data.map(vo => convertVoToDto(vo));
+          setRecognizedMedications(convertedData);
+          setRecognizedDialogVisible(true);
+        } else {
+          await MessagePlugin.error('未识别到药品信息');
+          setRecognizedMedications([]); // 清空已识别的药品列表 
         }
+
       } else {
         await MessagePlugin.error(result.msg || '识别失败');
       }
@@ -170,121 +192,135 @@ export default function MedicationDialog({ visible, onClose, onSuccess, initialD
   };
 
   return (
-    <Dialog
-      visible={visible}
-      onClose={onClose}
-      header={initialData ? "编辑服药提醒" : "新增服药提醒"}
-      confirmBtn="提交"
-      onConfirm={handleSubmit}
-      footer={
-        <div className="flex justify-between items-center w-full">
-          <div>
-            {!initialData && (
-              <Upload
-                accept="image/*"
-                theme="custom"
-                autoUpload={false}
-                disabled={uploading}
-                onChange={(files) => {
-                  const file = files[0]?.raw;
-                  if (file) {
-                    handleUpload(file).finally();
-                  }
-                }}
-              >
-                <Button loading={uploading} variant="outline" style={{ width: '120px' }}>
-                  {uploading ? '识别中...' : '上传处方图片识别'}
-                </Button>
-              </Upload>
-            )}
+    <>
+      <Dialog
+        visible={visible}
+        onClose={onClose}
+        header={initialData ? "编辑服药提醒" : "新增服药提醒"}
+        confirmBtn="提交"
+        onConfirm={handleSubmit}
+        footer={
+          <div className="flex justify-between items-center w-full">
+            <div>
+              {!initialData && (
+                <Upload
+                  allowUploadDuplicateFile
+                  accept="image/*"
+                  theme="custom"
+                  autoUpload={false}
+                  disabled={uploading}
+                  onChange={(files) => {
+                    const file = files[0]?.raw;
+                    if (file) {
+                      handleUpload(file).finally();
+                    }
+                  }}
+                >
+                  <Button loading={uploading} variant="outline" style={{ width: '120px' }}>
+                    {uploading ? '识别中...' : '上传处方图片识别'}
+                  </Button>
+                </Upload>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button theme="default" onClick={onClose}>取消</Button>
+              <Button theme="primary" loading={uploading} onClick={handleSubmit}>提交</Button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button theme="default" onClick={onClose}>取消</Button>
-            <Button theme="primary" loading={uploading} onClick={handleSubmit}>提交</Button>
-          </div>
-        </div>
-      }
-    >
-      <div className="space-y-6">
-        <div className="flex items-center">
-          <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>
-            药品名称
-            <span style={{ color: 'var(--td-error-color)' }} className="ml-0.5">*</span>
-          </label>
-          <Input
-            value={formData.medicationName}
-            onChange={(val) => setFormData({ ...formData, medicationName: val as string })}
-            placeholder="请输入药品名称"
-            className="flex-1"
-          />
-        </div>
-
-        <div className="flex items-center">
-          <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>
-            药品剂量
-            <span style={{ color: 'var(--td-error-color)' }} className="ml-0.5">*</span>
-          </label>
-          <Input
-            value={formData.medicationDosage}
-            onChange={(val) => setFormData({ ...formData, medicationDosage: val as string })}
-            placeholder="如: 5mg/片, 2片/次"
-            className="flex-1"
-          />
-        </div>
-
-        <div className="flex items-center">
-          <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>每日服药次数</label>
-          <InputNumber
-            value={formData.medicationFrequency}
-            onChange={(val) => setFormData({ ...formData, medicationFrequency: val as number })}
-            min={1}
-            max={10}
-            className="flex-1"
-          />
-        </div>
-
-        <div className="flex items-center">
-          <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>服药持续天数</label>
-          <InputNumber
-            value={formData.medicationDuration}
-            onChange={(val) => setFormData({ ...formData, medicationDuration: val as number })}
-            min={1}
-            max={365}
-            className="flex-1"
-          />
-        </div>
-
-        {formData.reminderTimes.map((time, index) => (
-          <div key={index} className="flex items-center">
+        }
+      >
+        <div className="space-y-6">
+          <div className="flex items-center">
             <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>
-              {formData.medicationFrequency > 1 ? `提醒时间 ${index + 1}` : "提醒时间"}
+              药品名称
               <span style={{ color: 'var(--td-error-color)' }} className="ml-0.5">*</span>
             </label>
-            <TimePicker
-              value={time}
-              format="HH:mm"
-              onChange={(val) => handleTimeChange(val as string, index)}
+            <Input
+              value={formData.medicationName}
+              onChange={(val) => setFormData({ ...formData, medicationName: val as string })}
+              placeholder="请输入药品名称"
               className="flex-1"
             />
           </div>
-        ))}
 
-        <div className="flex items-center">
-          <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>开始服药时间</label>
-          <DatePicker
-            value={formData.startTime}
-            mode="date"
-            format="YYYY-MM-DD"
-            onChange={(val) => {
-              if (val) {
-                setFormData({ ...formData, startTime: new Date(val) });
-              }
-            }}
-            className="flex-1"
-          />
+          <div className="flex items-center">
+            <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>
+              药品剂量
+              <span style={{ color: 'var(--td-error-color)' }} className="ml-0.5">*</span>
+            </label>
+            <Input
+              value={formData.medicationDosage}
+              onChange={(val) => setFormData({ ...formData, medicationDosage: val as string })}
+              placeholder="如: 5mg/片, 2片/次"
+              className="flex-1"
+            />
+          </div>
+
+          <div className="flex items-center">
+            <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>每日服药次数</label>
+            <InputNumber
+              value={formData.medicationFrequency}
+              onChange={(val) => setFormData({ ...formData, medicationFrequency: val as number })}
+              min={1}
+              max={10}
+              className="flex-1"
+            />
+          </div>
+
+          <div className="flex items-center">
+            <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>服药持续天数</label>
+            <InputNumber
+              value={formData.medicationDuration}
+              onChange={(val) => setFormData({ ...formData, medicationDuration: val as number })}
+              min={1}
+              max={365}
+              className="flex-1"
+            />
+          </div>
+
+          {formData.reminderTimes.map((time, index) => (
+            <div key={index} className="flex items-center">
+              <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>
+                {formData.medicationFrequency > 1 ? `提醒时间 ${index + 1}` : "提醒时间"}
+                <span style={{ color: 'var(--td-error-color)' }} className="ml-0.5">*</span>
+              </label>
+              <TimePicker
+                value={time}
+                format="HH:mm"
+                onChange={(val) => handleTimeChange(val as string, index)}
+                className="flex-1"
+              />
+            </div>
+          ))}
+
+          <div className="flex items-center">
+            <label className="w-32 flex-shrink-0" style={{ color: 'var(--td-text-color-primary)' }}>开始服药时间</label>
+            <DatePicker
+              value={formData.startTime}
+              mode="date"
+              format="YYYY-MM-DD"
+              onChange={(val) => {
+                if (val) {
+                  setFormData({ ...formData, startTime: new Date(val) });
+                }
+              }}
+              className="flex-1"
+            />
+          </div>
         </div>
+      </Dialog>
 
-      </div>
-    </Dialog>
+      {/* 识别结果对话框 */}
+      <RecognizedMedicationsDialog
+        visible={recognizedDialogVisible}
+        onClose={() => setRecognizedDialogVisible(false)}
+        onSuccess={() => {
+          setRecognizedDialogVisible(false);
+          onSuccess();
+          onClose();
+        }}
+        recognizedMedications={recognizedMedications}
+      />
+    </>
   );
 }
