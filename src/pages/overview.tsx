@@ -104,7 +104,7 @@ export default function Overview() {
         }
 
         if (dietResponse.code === 200 && dietResponse.data !== undefined) {
-          setDietCalories(dietResponse.data as number);
+          setDietCalories(dietResponse.data as unknown as number);
         }
 
         if (sleepResponse.code === 200 && sleepResponse.data) {
@@ -132,7 +132,7 @@ export default function Overview() {
         title={"体征数据"}
         actions={(
           <Button theme="primary" variant="text" icon={<AddIcon/>} onClick={() => setShowBiometricDialog(true)}>
-            添加记录
+            记录体征数据
           </Button>
         )}
       >
@@ -149,7 +149,7 @@ export default function Overview() {
 
       <Row gutter={[16, 16]}>
         <Col span={6}>
-          <Statistic title="BMI" value={biometricData.bmi?.toFixed(1)} />
+          <Statistic title="BMI" value={Number(biometricData.bmi?.toFixed(1))} />
           <Tag theme={biometricData.bmiLevel === "正常" ? "success" : "warning"} className="ml-2 mt-2">
             {biometricData.bmiLevel}
           </Tag>
@@ -157,7 +157,7 @@ export default function Overview() {
               <Col span={6}>
                 <Statistic
                   title="血压"
-                  value={`${biometricData.systolicPressure}/${biometricData.diastolicPressure}`}
+                  value={`${biometricData.systolicPressure}/${biometricData.diastolicPressure}` as any}
                   unit="mmHg"
                 />
                 <Tag theme={biometricData.bloodPressureLevel === "正常" ? "success" : "warning"} className="ml-2 mt-2">
@@ -178,7 +178,7 @@ export default function Overview() {
               </Col>
               <Col span={12}>
                 <div className="text-sm text-gray-500">
-                  测量时间：{new Date(biometricData.measurementTime).toLocaleString()}
+                  测量时间：{new Date(biometricData.measurementTime as any).toLocaleString()}
                 </div>
               </Col>
             </Row>
@@ -190,18 +190,16 @@ export default function Overview() {
         title={"运动数据"}
         actions={(
           <Button theme="primary" variant="text" icon={<AddIcon/>} onClick={() => setShowExerciseDialog(true)}>
-            添加记录
+            记录运动数据
           </Button>
         )}
       >
         {exerciseData && (
           <div className={"w-full flex flex-row items-center justify-between p-4"}>
-            <Statistic title="运动类型" value={exerciseData.exerciseType} />
+            <Statistic title="运动类型" value={exerciseData.exerciseType as any} />
             <Statistic title="运动时长" value={exerciseData.durationMinutes} unit="分钟" />
             <Statistic title="消耗热量" value={exerciseData.caloriesBurned} unit="千卡" />
-            <div className="text-sm text-gray-500">
-              开始时间：{new Date(exerciseData.startTimestamp).toLocaleString()}
-            </div>
+            <Statistic title="运动时间" value={new Date(exerciseData.startTimestamp).toLocaleString() as any}/>
           </div>
         )}
       </Card>
@@ -210,7 +208,7 @@ export default function Overview() {
         title={"饮食数据"}
         actions={(
           <Button theme="primary" variant="text" icon={<AddIcon/>} onClick={() => setShowDietDialog(true)}>
-            添加记录
+            记录饮食数据
           </Button>
         )}
       >
@@ -223,7 +221,7 @@ export default function Overview() {
         title={"睡眠数据"}
         actions={(
           <Button theme="primary" variant="text" icon={<AddIcon/>} onClick={() => setShowSleepDialog(true)}>
-            添加记录
+            记录睡眠数据
           </Button>
         )}
       >
@@ -257,8 +255,13 @@ export default function Overview() {
           )}
         >
           <div className={"w-full flex flex-row items-center justify-between p-4"}>
+          <div>
+              <Statistic
+                title="当前目标"
+                value={goalCategoryMap[healthGoal.goalCategory as string] as any}
+              />
+            </div>
             <div>
-              <div className="text-sm text-gray-500 mb-2">{goalCategoryMap[healthGoal.goalCategory]}</div>
               <Statistic
                 title="目标值"
                 value={healthGoal.targetValue}
@@ -267,7 +270,6 @@ export default function Overview() {
               />
             </div>
             <div>
-              <div className="text-sm text-gray-500 mb-2">当前进度</div>
               <Statistic
                 title="当前值"
                 value={healthGoal.currentValue}
@@ -277,9 +279,9 @@ export default function Overview() {
             </div>
             <div>
               <div className="text-sm text-gray-500 mb-2">目标日期</div>
-              <div>{new Date(healthGoal.targetDate).toLocaleDateString()}</div>
-              <Tag theme={goalStatusMap[healthGoal.goalStatus].theme} className="mt-2">
-                {goalStatusMap[healthGoal.goalStatus].text}
+              <div>{new Date(healthGoal.targetDate as any).toLocaleDateString()}</div>
+              <Tag theme={goalStatusMap[healthGoal.goalStatus as any].theme} className="mt-2">
+                {goalStatusMap[healthGoal.goalStatus as any].text}
               </Tag>
             </div>
           </div>
@@ -304,17 +306,17 @@ export default function Overview() {
             <>
               <Statistic
                 title="下次体检时间"
-                value={healthCheckReminder.scheduledTime}
+                value={healthCheckReminder.scheduledTime?.toLocaleDateString() as any}
               />
               <Statistic
                 title="检查周期"
                 value={healthCheckReminder.checkFrequencyDays}
                 unit="天"
               />
-              <div>
-                <div className="text-sm text-gray-500 mb-1">提醒内容</div>
-                <div>{healthCheckReminder.reminderContent}</div>
-              </div>
+              <Statistic
+                title="提醒检查内容"
+                value={healthCheckReminder.reminderContent as any}
+              />
             </>
           )}
         </div>

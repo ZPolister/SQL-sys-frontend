@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {Button, Card, Progress, MessagePlugin, DialogPlugin} from "tdesign-react";
+import {Button, Card, Progress, MessagePlugin, DialogPlugin, Row, Col, Statistic, Tag, Divider} from "tdesign-react";
 import {$app} from "../app/app";
 import {DeleteHealthGoalsGoalIdRequest, ResponseResultHealthGoal} from "../api";
 import GoalDialog from "./components/Dialogs/GoalDialog";
@@ -24,9 +24,10 @@ export default function Goal() {
   const [analysis, setAnalysis] = useState<string[]>([]);
   const [goalSuggestion, setGoalSuggestion] = useState<GoalSuggestion | null>(null);
   const [showGoalDialog, setShowGoalDialog] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerationComplete, setIsGenerationComplete] = useState(false);
 
   // 用于存储流式数据的解码器
-  // const decoder = new TextDecoder();
   const analysisText = useRef("");
 
   const abortController = useRef<any>(new AbortController());
@@ -58,10 +59,13 @@ export default function Goal() {
   const fetchAnalysis = async () => {
     console.log("发起请求")
     const currentFetchController = abortController.current;
-
-    // const api = $app.$DefaultApi;
-    // const decoder = new TextDecoder(); // 初始化解码器
-    // let buffer = ''; // 用于缓存未解析的数据
+    
+    // 重置状态
+    setIsGenerating(true);
+    setIsGenerationComplete(false);
+    analysisText.current = "";
+    setAnalysis([]);
+    setGoalSuggestion(null);
 
     const evtSrc = new EventSource("/api/analysis/stream");
 
@@ -90,111 +94,19 @@ export default function Goal() {
     evtSrc.onerror = (error) => {
       console.log("事件源错误或结束:", error);
       evtSrc.close();
-      parseGoal(analysisText.current)
+      parseGoal(analysisText.current);
+      setIsGenerationComplete(true);
     };
-
-        // 解析缓存中的数据，去除 `data:` 前缀和换行符
-        // const {parsedText, remainingBuffer} = parseBuffer(buffer);
-        // buffer = remainingBuffer; // 更新缓存
-
-        // console.log("text", parsedText)
-
-        // 更新状态
-        // if (parsedText) {
-        //   analysisText.current += parsedText;
-        //   updateAnalysis(analysisText.current);
-        // }
-
-    // const trimText = (rawText: string): string => {
-    //   // return (rawText.replace(/data:/g, '').replace(/\n\n/g, ""))
-    //   const match = rawText.match(/(?<=data:)([\s\S]*?)(?=\n\n)/);
-    //   console.log("match", match?.[0])
-    //
-    //   if (match) {
-    //     return match[0].replace(/\ndata:/g, "\n");
-    //   } else {
-    //     return ""
-    //   }
-    // }
-
-    // try {
-    //   const response = await api.getAnalysisStream(
-    //     {},
-    //     {signal: abortController.current.signal}
-    //   ) as Response;
-    //
-    //   if (!response.body) {
-    //     throw new Error("响应体为空");
-    //   }
-    //
-    //   const reader = response.body.getReader();
-    //
-    //   analysisText.current = '';
-    //
-    //   while (true) {
-    //     // 检查是否被取消
-    //     if (currentFetchController.signal.aborted) {
-    //       console.log("取消请求")
-    //       await reader.cancel()
-    //       return;
-    //     }
-    //
-    //     const {done, value} = await reader.read();
-    //     if (done) break; // 流结束
-    //
-    //     const decodedText = decoder.decode(value, {stream: true});
-    //     console.log("解码数据块:", decodedText)
-    //
-    //     // 解码数据块并追加到缓存中
-    //     // buffer += decodedText
-    //     const parsedText = trimText(decodedText)
-    //
-    //     // 解析缓存中的数据，去除 `data:` 前缀和换行符
-    //     // const {parsedText, remainingBuffer} = parseBuffer(buffer);
-    //     // buffer = remainingBuffer; // 更新缓存
-    //
-    //     // console.log("text", parsedText)
-    //
-    //     // 更新状态
-    //     if (parsedText) {
-    //       analysisText.current += parsedText;
-    //       updateAnalysis(analysisText.current);
-    //     }
-    //
-    //     // 查找并解析目标建议
-    //     parseGoal(analysisText.current);
-    //   }
-    //
-    //   console.log("请求完成", analysisText.current)
-    // } catch (error) {
-    //   console.error("获取分析失败:", error);
-    // }
-
   };
 
-  /**
-   * 解析缓存中的数据，去除 `data:` 前缀和换行符
-   * @param {string} buffer - 缓存数据
-   * @returns {Object} - { parsedText: string, remainingBuffer: string }
-   */
-  // const parseBuffer = (buffer) => {
-  //   // 按换行符分割数据块
-  //   const lines = buffer.split("\n");
-  //
-  //   // 解析每行数据，去除 `data:` 前缀
-  //   const parsedLines = lines
-  //     .map(line => line.trim()) // 去除空白字符
-  //     .filter(line => line.startsWith("data:")) // 过滤以 `data:` 开头的行
-  //     .map(line => line.slice(5).trim()); // 去除 `data:` 前缀并去除空白字符
-  //
-  //   // 将解析后的行合并为文本
-  //   const parsedText = parsedLines.join("\n");
-  //
-  //   // 保留未解析的部分（最后一行的未完成数据）
-  //   const remainingBuffer = lines[lines.length - 1].startsWith("data:") ? '' : lines[lines.length - 1];
-  //
-  //   return {parsedText, remainingBuffer};
-  // };
+  // 停止生成
+  const stopGeneration = () => {
+    if (abortController.current) {
+      abortController.current.abort();
+      abortController.current = new AbortController();
+      setIsGenerationComplete(true);
+    }
+  };
 
   /**
    * 更新分析结果状态
@@ -275,6 +187,9 @@ export default function Goal() {
         }
       },
     });
+    oncancel: () => {
+      dialog.hide();
+    }
   };
 
   const handleQuickCreateGoal = async () => {
@@ -308,6 +223,13 @@ export default function Goal() {
     return categories[category as keyof typeof categories] || category;
   };
 
+  // 目标状态映射
+  const goalStatusMap: Record<number, { text: string; theme: 'success' | 'warning' | 'default' }> = {
+    0: { text: '进行中', theme: 'default' },
+    1: { text: '已达成', theme: 'success' },
+    2: { text: '未达成', theme: 'warning' }
+  };
+
   return (
     <div className="p-6 flex flex-col gap-5">
       {/* 当前目标卡片 */}
@@ -328,57 +250,66 @@ export default function Goal() {
         }
       >
         {currentGoal?.data ? (
-          <div className="flex items-center gap-8">
-            <div className="flex-1">
-              <h3 className="text-2xl font-bold mb-4">
-                {renderGoalCategory(currentGoal.data.goalCategory as string)}
-              </h3>
-              <p className="text-xl mb-3">
-                <span className="text-gray-600">目标值: </span>
-                <span className="font-bold">
-                  {currentGoal.data.targetValue}
-                  {currentGoal.data.goalCategory === "WEIGHT_LOSS" && " kg"}
-                  {currentGoal.data.goalCategory === "EXERCISE_CALORIES" && " kcal"}
-                  {currentGoal.data.goalCategory === "BLOOD_SUGAR" && " mmol/L"}
-                  {currentGoal.data.goalCategory === "BLOOD_LIPID" && " mmol/L"}
-                </span>
-              </p>
-              <p className="text-xl mb-3">
-                <span className="text-gray-600">目标日期: </span>
-                <span className="font-bold">
-                  {toDateString(new Date(currentGoal.data.targetDate as any))}
-                </span>
-              </p>
-              <p className="text-xl mb-3">
-                <span className="text-gray-600">当前进度: </span>
-                <span className="font-bold">
-                  {calculateProgress(
-                    currentGoal.data.currentValue || 0,
-                    currentGoal.data.targetValue as number,
-                    currentGoal.data.goalCategory as string
-                  )} %
-                </span>
-              </p>
-            </div>
-            <div className="w-32">
-              <Progress
-                theme="circle"
-                percentage={calculateProgress(
-                currentGoal.data.currentValue || 0,
-                  currentGoal.data.targetValue as number,
-                  currentGoal.data.goalCategory as string
-                )}
-                status={
-                  currentGoal.data.goalCategory === 'EXERCISE_CALORIES'
-                    ? (currentGoal.data.currentValue >= currentGoal.data.targetValue ? "success" : "warning")
-                    : (currentGoal.data.currentValue <= currentGoal.data.targetValue ? "success" : "warning")
-                }
-              />
-            </div>
+          <div className="w-full flex flex-col gap-4 p-4">
+            <Row gutter={[16, 16]}>
+              <Col span={6}>
+                <div className="text-sm mb-2" style={{ color: 'var(--td-text-color-secondary)' }}>目标类型</div>
+                <div className="text-xl font-medium">
+                  {renderGoalCategory(currentGoal.data.goalCategory as string)}
+                  <Tag theme={goalStatusMap[currentGoal.data.goalStatus as number]?.theme || 'default'} className="mt-2 ml-2">
+                  {goalStatusMap[currentGoal.data.goalStatus as number]?.text || '进行中'}
+                </Tag>
+                </div>
+              </Col>
+              <Col span={6}>
+                <Statistic 
+                  title="目标值" 
+                  value={Number(currentGoal.data.targetValue)} 
+                  unit={currentGoal.data.goalCategory === 'EXERCISE_CALORIES' ? '千卡' :
+                        currentGoal.data.goalCategory === 'WEIGHT_LOSS' ? 'kg' : 'mmol/L'} 
+                />
+              </Col>
+              <Col span={6}>
+                <Statistic 
+                  title="当前值" 
+                  value={Number(currentGoal.data.currentValue || 0)} 
+                  unit={currentGoal.data.goalCategory === 'EXERCISE_CALORIES' ? '千卡' :
+                        currentGoal.data.goalCategory === 'WEIGHT_LOSS' ? 'kg' : 'mmol/L'} 
+                />
+              </Col>
+              <Col span={6}>
+                {/* <div className="flex items-center justify-center h-full">
+                  <Progress
+                    theme="circle"
+                    percentage={calculateProgress(
+                      currentGoal.data.currentValue || 0,
+                      currentGoal.data.targetValue as number,
+                      currentGoal.data.goalCategory as string
+                    )}
+                    status={
+                      currentGoal.data.goalCategory === 'EXERCISE_CALORIES'
+                        ? (currentGoal.data.currentValue >= currentGoal.data.targetValue ? "success" : "warning")
+                        : (currentGoal.data.currentValue <= currentGoal.data.targetValue ? "success" : "warning")
+                    }
+                  />
+                </div> */}
+                <div className="text-sm mb-2" style={{ color: 'var(--td-text-color-secondary)' }}>达成截止日期</div>
+                <div className="text-xl font-medium">
+                {toDateString(new Date(currentGoal.data.targetDate as any))}
+                </div>
+              </Col>
+            </Row>
+            {/* <Row>
+              <Col span={12}>
+                <div className="text-sm" style={{ color: 'var(--td-text-color-secondary)' }}>
+                  目标日期：{toDateString(new Date(currentGoal.data.targetDate as any))}
+                </div>
+              </Col>
+            </Row> */}
           </div>
         ) : (
           <div className="text-center py-8">
-            <p className="text-xl text-gray-600 mb-6">暂无目标</p>
+            <p className="text-xl mb-6" style={{ color: 'var(--td-text-color-secondary)' }}>暂无目标</p>
             <Button theme="primary" size="large" onClick={() => setShowGoalDialog(true)}>
               创建目标
             </Button>
@@ -388,35 +319,70 @@ export default function Goal() {
 
       {/* 健康建议卡片 */}
       <Card title="健康建议">
-        <div className="space-y-4">
+        <div className="space-y-4" style={{ color: 'var(--td-text-color-primary)' }}>
           {analysis.length > 0 ? (
             <>
-              {analysis.map((line, index) => {
-                return <p key={index} className="text-gray-700">{line}</p>;
-              })}
+              <div className="mb-4">
+                {analysis.map((line, index) => {
+                  return <p key={index} className="mb-2" style={{ color: 'var(--td-text-color-secondary)' }}>{line}</p>;
+                })}
+              </div>
 
               {goalSuggestion && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                  <h4 className="text-lg font-medium mb-2">建议目标</h4>
-                  <p className="mb-2">
-                    {renderGoalCategory(goalSuggestion.goalCategory)}：
-                    {goalSuggestion.targetValue}
-                    {goalSuggestion.goalCategory === "WEIGHT_LOSS" && " kg"}
-                    {goalSuggestion.goalCategory === "EXERCISE_CALORIES" && " kcal"}
-                    {goalSuggestion.goalCategory === "BLOOD_SUGAR" && " mmol/L"}
-                    {goalSuggestion.goalCategory === "BLOOD_LIPID" && " mmol/L"}
-                  </p>
-                  <p className="mb-4">目标日期：{toDateString(new Date(goalSuggestion.targetDate))}</p>
+                <div className="mt-4 p-4 rounded-lg" style={{ 
+                  backgroundColor: 'var(--td-bg-color-container-hover)',
+                  borderLeft: '4px solid var(--td-brand-color)'
+                }}>
+                  <h4 className="text-lg font-medium mb-2" style={{ color: 'var(--td-text-color-primary)' }}>建议目标</h4>
+                  <Divider style={{ margin: '12px 0' }} />
+                  <Row gutter={[16, 16]} className="mb-4">
+                    <Col span={8}>
+                      <div className="flex flex-col">
+                        <div className="text-sm mb-1" style={{ color: 'var(--td-text-color-secondary)' }}>目标类型</div>
+                        <div className="text-xl font-medium">
+                          {renderGoalCategory(goalSuggestion.goalCategory)}
+                        </div>
+                      </div>
+                    </Col>
+                    <Col span={8}>
+                      <Statistic 
+                        title="目标值" 
+                        value={Number(goalSuggestion.targetValue)}
+                        unit={goalSuggestion.goalCategory === 'EXERCISE_CALORIES' ? '千卡' :
+                              goalSuggestion.goalCategory === 'WEIGHT_LOSS' ? 'kg' : 'mmol/L'} 
+                      />
+                    </Col>
+                    <Col span={8}>
+                      <div className="flex flex-col">
+                        <div className="text-sm mb-1" style={{ color: 'var(--td-text-color-secondary)' }}>目标日期</div>
+                        <div className="text-xxl font-large">
+                          {toDateString(new Date(goalSuggestion.targetDate))}
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
                   <Button theme="primary" onClick={handleQuickCreateGoal}>
                     采纳建议
                   </Button>
                 </div>
               )}
+              
+              <div className="flex justify-center mt-6">
+                {isGenerationComplete ? (
+                  <Button theme="primary" onClick={fetchAnalysis}>
+                    重新生成
+                  </Button>
+                ) : (
+                  <Button theme="danger" onClick={stopGeneration}>
+                    停止生成
+                  </Button>
+                )}
+              </div>
             </>
           ) : (
-            <div className="text-center py-4">
-              <p className="text-gray-600 mb-4">点击按钮获取个性化健康建议</p>
-              <Button theme="primary" onClick={fetchAnalysis}>
+            <div className="text-center py-8">
+              <p className="mb-6" style={{ color: 'var(--td-text-color-secondary)' }}>点击获取属于你的个性化健康建议！</p>
+              <Button theme="primary" onClick={fetchAnalysis} loading={isGenerating && !analysis.length}>
                 获取建议
               </Button>
             </div>
