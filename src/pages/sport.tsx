@@ -1,16 +1,39 @@
-import {
-  Button,
-  Card,
-  Table,
-  DateRangePicker,
-  Select,
-} from "tdesign-react";
+import { Button, Card, Table, DateRangePicker, Select } from "tdesign-react";
 import { useEffect, useState } from "react";
 import * as echarts from "echarts";
-import {ExerciseLogDto, ResponseResult, ResponseResultPageExerciseLog} from "../api";
+import {
+  ExerciseLogDto,
+  ResponseResult,
+  ResponseResultPageExerciseLog,
+} from "../api";
 import { $app } from "../app/app";
 import { MessagePlugin } from "tdesign-react";
 import ExerciseDialog from "./components/Dialogs/ExerciseDialog";
+
+const exportExcel = async () => {
+  try {
+    const response = await fetch("/api/export/exercise", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    if (!response.ok) {
+      throw new Error("网络错误");
+    }
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "export.xlsx";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("导出失败:", error);
+  }
+};
 
 const toDateString = (dt: Date) => {
   // 获取时间信息
@@ -81,7 +104,9 @@ export default function Sport() {
 
   const fetchChartData = async () => {
     const api = $app.$DefaultApi;
-    const result = await api.getExerciseDailyCaloriesBurned({ range: timeRange }) as ResponseResult
+    const result = (await api.getExerciseDailyCaloriesBurned({
+      range: timeRange,
+    })) as ResponseResult;
     if (result.code === 200) setChartData(result.data);
   };
 
@@ -110,7 +135,10 @@ export default function Sport() {
       if (existingChart) {
         existingChart.dispose();
       }
-      const myChart = echarts.init(chartDom, $app.$isDarkTheme ? "dark" : "light");
+      const myChart = echarts.init(
+        chartDom,
+        $app.$isDarkTheme ? "dark" : "light"
+      );
       const option = {
         backgroundColor: "",
         tooltip: { trigger: "axis" },
@@ -222,7 +250,7 @@ export default function Sport() {
       <Card title="运动记录">
         <div className="mb-4 flex justify-between items-center">
           <div className="flex gap-4 items-center">
-            <Button theme="success" onClick={() => window.open('/api/exercise/export', '_blank')}>
+            <Button theme="success" onClick={exportExcel}>
               导出Excel
             </Button>
             <DateRangePicker

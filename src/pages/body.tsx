@@ -2,16 +2,39 @@ import {
   Button,
   Card,
   Table,
-  DateRangePicker, MessagePlugin,
+  DateRangePicker,
+  MessagePlugin,
 } from "tdesign-react";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import * as echarts from "echarts";
-import {
-  BiometricRecordVo,
-  ResponseResultPageBiometricRecordVo,
-} from "../api";
-import {$app} from "../app/app";
+import { BiometricRecordVo, ResponseResultPageBiometricRecordVo } from "../api";
+import { $app } from "../app/app";
 import BiometricDialog from "./components/Dialogs/BiometricDialog";
+
+const exportExcel = async () => {
+  try {
+    const response = await fetch("/api/export/biometric", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    if (!response.ok) {
+      throw new Error("网络错误");
+    }
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "export.xlsx";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("导出失败:", error);
+  }
+};
 
 const toDateString = (dt: Date) => {
   // 获取时间信息
@@ -77,7 +100,7 @@ export default function BiometricData() {
 
   const fetchChartData = async () => {
     const api = $app.$DefaultApi;
-    const result = await api.getHealthChart({timeRange});
+    const result = await api.getHealthChart({ timeRange });
     if (result.code === 200) setChartData(result.data);
   };
 
@@ -109,10 +132,13 @@ export default function BiometricData() {
       if (existingChart) {
         existingChart.dispose();
       }
-      const myChart = echarts.init(chartDom, $app.$isDarkTheme ? "dark" : "light");
+      const myChart = echarts.init(
+        chartDom,
+        $app.$isDarkTheme ? "dark" : "light"
+      );
       const option = {
         backgroundColor: "",
-        tooltip: {trigger: "axis"},
+        tooltip: { trigger: "axis" },
         legend: {
           data: ["体重", "收缩压", "舒张压", "血糖", "血脂", "BMI"],
           bottom: 0,
@@ -194,7 +220,7 @@ export default function BiometricData() {
   const handleDelete = async (id: number) => {
     const api = $app.$DefaultApi;
     try {
-      const result = await api.deleteHealthBiometricId({id});
+      const result = await api.deleteHealthBiometricId({ id });
       if (result.code === 200) {
         await fetchRecords();
         await fetchChartData();
@@ -262,7 +288,7 @@ export default function BiometricData() {
       <Card title="体征数据记录">
         <div className="mb-4 flex justify-between items-center">
           <div className="flex gap-4 items-center">
-            <Button theme="success" onClick={() => window.open('/api/health/records/export', '_blank')}>
+            <Button theme="success" onClick={exportExcel}>
               导出Excel
             </Button>
             <DateRangePicker
@@ -292,7 +318,7 @@ export default function BiometricData() {
               ellipsis: true,
               title: "身高",
               colKey: "heightCm",
-              cell: ({row}) => `${row.heightCm} cm`,
+              cell: ({ row }) => `${row.heightCm} cm`,
             },
             {
               align: "center",
@@ -300,7 +326,7 @@ export default function BiometricData() {
               ellipsis: true,
               title: "体重",
               colKey: "weightKg",
-              cell: ({row}) => `${row.weightKg} kg`,
+              cell: ({ row }) => `${row.weightKg} kg`,
             },
             {
               align: "center",
@@ -308,7 +334,7 @@ export default function BiometricData() {
               ellipsis: true,
               title: "收缩压",
               colKey: "systolicPressure",
-              cell: ({row}) => `${row.systolicPressure} mmHg`,
+              cell: ({ row }) => `${row.systolicPressure} mmHg`,
             },
             {
               align: "center",
@@ -316,7 +342,7 @@ export default function BiometricData() {
               ellipsis: true,
               title: "舒张压",
               colKey: "diastolicPressure",
-              cell: ({row}) => `${row.diastolicPressure} mmHg`,
+              cell: ({ row }) => `${row.diastolicPressure} mmHg`,
             },
             {
               align: "center",
@@ -324,7 +350,7 @@ export default function BiometricData() {
               ellipsis: true,
               title: "血糖",
               colKey: "bloodGlucose",
-              cell: ({row}) => `${row.bloodGlucose} mmol/L`,
+              cell: ({ row }) => `${row.bloodGlucose} mmol/L`,
             },
             {
               align: "center",
@@ -332,7 +358,7 @@ export default function BiometricData() {
               ellipsis: true,
               title: "血脂",
               colKey: "bloodLipid",
-              cell: ({row}) => `${row.bloodLipid} mmol/L`,
+              cell: ({ row }) => `${row.bloodLipid} mmol/L`,
             },
             {
               align: "center",
@@ -340,7 +366,7 @@ export default function BiometricData() {
               ellipsis: true,
               title: "测量时间",
               colKey: "measurementTime",
-              cell: ({row}) => {
+              cell: ({ row }) => {
                 const date = row.measurementTime;
                 return date?.toLocaleString("zh-CN", {
                   year: "numeric",
@@ -359,7 +385,7 @@ export default function BiometricData() {
               fixed: "right",
               title: "操作",
               colKey: "action",
-              cell: ({row}) => (
+              cell: ({ row }) => (
                 <Button
                   theme="danger"
                   variant="text"

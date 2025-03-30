@@ -1,16 +1,35 @@
-import {
-  Button,
-  Card,
-  Table,
-  DateRangePicker,
-  Select,
-} from "tdesign-react";
+import { Button, Card, Table, DateRangePicker, Select } from "tdesign-react";
 import { useEffect, useState } from "react";
 import * as echarts from "echarts";
-import {DietLogDto, ResponseResult, ResponseResultPageDietLog} from "../api";
+import { DietLogDto, ResponseResult, ResponseResultPageDietLog } from "../api";
 import { $app } from "../app/app";
 import { MessagePlugin } from "tdesign-react";
 import DietDialog from "./components/Dialogs/DietDialog";
+
+const exportExcel = async () => {
+  try {
+    const response = await fetch("/api/export/diet", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    if (!response.ok) {
+      throw new Error("网络错误");
+    }
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "export.xlsx";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("导出失败:", error);
+  }
+};
 
 const toDateString = (dt: Date) => {
   // 获取时间信息
@@ -111,7 +130,10 @@ export default function Nutrition() {
       if (existingChart) {
         existingChart.dispose();
       }
-      const myChart = echarts.init(chartDom, $app.$isDarkTheme ? "dark" : "light");
+      const myChart = echarts.init(
+        chartDom,
+        $app.$isDarkTheme ? "dark" : "light"
+      );
       const option = {
         backgroundColor: "",
         tooltip: { trigger: "axis" },
@@ -212,9 +234,7 @@ export default function Nutrition() {
       <Card title="饮食记录">
         <div className="mb-4 flex justify-between items-center">
           <div className="flex gap-4 items-center">
-            <Button theme="success" onClick={() => {
-              downloadExportExcel();
-            }}>
+            <Button theme="success" onClick={exportExcel}>
               导出Excel
             </Button>
             <DateRangePicker
@@ -335,23 +355,3 @@ export default function Nutrition() {
     </div>
   );
 }
-
-// 新增导出Excel函数
-const downloadExportExcel = async () => {
-  try {
-    const api = $app.$DefaultApi;
-    const response = await api.getExportDiet() as any; // 假设后端有导出接口
-    if (response && response.type === 'blob') {
-      const url = URL.createObjectURL(new Blob([response]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'diet_records.xlsx');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-    }
-  } catch (error) {
-    await MessagePlugin.error('导出失败，请重试');
-  }
-};
