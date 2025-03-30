@@ -187,7 +187,7 @@ export default function Goal() {
         }
       },
     });
-    oncancel: () => {
+    onCancel: () => {
       dialog.hide();
     }
   };
@@ -324,7 +324,7 @@ export default function Goal() {
             <>
               <div className="mb-4">
                 {analysis.map((line, index) => {
-                  return <p key={index} className="mb-2" style={{ color: 'var(--td-text-color-secondary)' }}>{line}</p>;
+                  return <p key={index} className="mb-2 text-l" style={{ color: 'var(--td-text-color-secondary)' }}>{line}</p>;
                 })}
               </div>
 
@@ -381,7 +381,7 @@ export default function Goal() {
             </>
           ) : (
             <div className="text-center py-8">
-              <p className="mb-6" style={{ color: 'var(--td-text-color-secondary)' }}>点击获取属于你的个性化健康建议！</p>
+              <p className="mb-6 text-xl" style={{ color: 'var(--td-text-color-secondary)' }}>点击获取属于你的个性化健康建议！</p>
               <Button theme="primary" onClick={fetchAnalysis} loading={isGenerating && !analysis.length}>
                 获取建议
               </Button>

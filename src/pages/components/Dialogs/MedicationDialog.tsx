@@ -1,5 +1,5 @@
-import { Dialog, Input, InputNumber, DatePicker, TimePicker, MessagePlugin, Upload, Button, UploadFile } from "tdesign-react";
-import { useState, useEffect, useRef } from "react";
+import { Dialog, Input, InputNumber, DatePicker, TimePicker, MessagePlugin, Upload, Button } from "tdesign-react";
+import { useState, useEffect } from "react";
 import { MedicationReminderDto, MedicationReminder, MedicationReminderVo } from "../../../api";
 import { $app } from "../../../app/app";
 import RecognizedMedicationsDialog from "./RecognizedMedicationsDialog";

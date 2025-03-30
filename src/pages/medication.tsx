@@ -108,6 +108,7 @@ export default function Medication() {
     <div className="p-6 flex flex-col gap-5">
       {/* 上半部分：最近的服药提醒 */}
       <Card title="最近服药提醒">
+        { recentReminders.length > 0 ? (
         <Row gutter={[16, 16]}>
           {recentReminders.map((reminder) => (
             <Col key={reminder.reminderId} xs={24} sm={12} md={6}>
@@ -163,7 +164,11 @@ export default function Medication() {
               </Card>
             </Col>
           ))}
-        </Row>
+        </Row>) : (
+          <div className="text-center py-8">
+            <p className="text-xl mb-6" style={{color: 'var(--td-text-color-secondary)'}}>最近不用吃药噢，不用吃药身体倍儿棒~</p>
+          </div>
+        )}
       </Card>
 
       {/* 下半部分：分页表格 */}
@@ -261,7 +266,7 @@ export default function Medication() {
               title: "状态",
               colKey: "status",
               cell: ({ row }) => <Tag theme={row.completionStatus == 0 ? "warning" : "success"}>
-                {row.completionStatus == 0 ? "正在服用" : "已服用完毕"}
+                {row.completionStatus == 0 ? "正在服用" : "已完成服用"}
               </Tag>,
             },
             {
