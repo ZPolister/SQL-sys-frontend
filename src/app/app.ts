@@ -97,7 +97,7 @@ export class HealthApp extends EventTarget {
   }
 
   showVersion() {
-    console.log(`Version: TTXX \nAPI: ${__API_URL__}`);
+    console.log(`Version: 2025.4.3 \nAPI: ${__API_URL__}`);
     this.$SystemControllerApi.getSystem().then((res) => {
       console.log(res);
     })

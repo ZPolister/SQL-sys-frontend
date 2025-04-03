@@ -161,15 +161,15 @@ const App: React.FC = () => {
                       value="item1"
                       logo={(
                         <div className={"text-lg font-semibold"}>
-                          TTXX健康管理平台
+                          Dian Health 健康管理平台
                         </div>
                       )}
                       operations={
                         <div className="t-menu__operations">
-                          <NotificationIcon
-                            className="t-menu__operations-icon"
-                            onClick={handleNotification}
-                          />
+                          {/*<NotificationIcon*/}
+                          {/*  className="t-menu__operations-icon"*/}
+                          {/*  onClick={handleNotification}*/}
+                          {/*/>*/}
                           <ModeDarkIcon
                             className="t-menu__operations-icon"
                             onClick={() => {
@@ -191,11 +191,7 @@ const App: React.FC = () => {
                         </div>
                       }
                   >
-                      <MenuItem value="item2">顶部</MenuItem>
-                      <MenuItem value="item3">导航按钮</MenuItem>
-                      <MenuItem value="item4" disabled>
-                          留给你TTXX
-                      </MenuItem>
+                      {/*<MenuItem value="item2">顶部</MenuItem>*/}
                   </HeadMenu>
               </Header>
 
@@ -214,7 +210,7 @@ const App: React.FC = () => {
                         {renderContent()}
                       </Content>
 
-                      <Footer>Copyright @ TTXX 2025. All Rights Reserved</Footer>
+                      <Footer>Copyright @ Dian Health 2025. All Rights Reserved</Footer>
 
                   </Layout>
               </Layout>

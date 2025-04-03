@@ -20,7 +20,7 @@ export default memo(() => {
       <div className={Style.loginContainer}>
         <div className={Style.titleContainer}>
           <h1 className={Style.title}>登录到</h1>
-          <h1 className={Style.title}>TTXX Health</h1>
+          <h1 className={Style.title}>Dian Health</h1>
           <div className={Style.subTitle}>
             <p className={classNames(Style.tip, Style.registerTip)}>
               {type === 'register' ? '已有账号?' : '没有账号吗?'}
@@ -35,7 +35,7 @@ export default memo(() => {
         </div>
         {type === 'login' ? <Login/> : <Register handleSwitchLoginType={handleSwitchLoginType}/>}
       </div>
-      <footer className={Style.copyright}>Copyright @ 2025 TTXX. All Rights Reserved</footer>
+      <footer className={Style.copyright}>Copyright @ 2025 Dian Health. All Rights Reserved</footer>
     </div>
   );
 });
