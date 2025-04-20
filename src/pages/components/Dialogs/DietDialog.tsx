@@ -80,7 +80,7 @@ export default function DietDialog({ visible, onClose, onSuccess }: DietDialogPr
         <Form.FormItem label="食用时间">
           <DatePicker
             enableTimePicker
-            format="YYYY-MM-DD HH:mm:ss"
+            format="YYYY-MM-DD HH:mm"
             value={
               formData.consumptionTime
                 ? new Date(formData.consumptionTime)

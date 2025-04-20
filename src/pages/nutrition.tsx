@@ -291,7 +291,7 @@ export default function Nutrition() {
                 const date = row.consumptionTime
                   ? new Date(row.consumptionTime)
                   : null;
-                return date?.toLocaleString();
+                return date?.toLocaleString().slice(0, -3);
               },
             },
             {

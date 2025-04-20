@@ -199,7 +199,7 @@ export default function Overview() {
             <Statistic title="运动类型" value={exerciseData.exerciseType as any} />
             <Statistic title="运动时长" value={exerciseData.durationMinutes} unit="分钟" />
             <Statistic title="消耗热量" value={exerciseData.caloriesBurned} unit="千卡" />
-            <Statistic title="运动时间" value={new Date(exerciseData.startTimestamp).toLocaleString() as any}/>
+            <Statistic title="运动时间" value={new Date(exerciseData.startTimestamp).toLocaleString().slice(0, -3) as any}/>
           </div>
         )}
       </Card>
@@ -229,11 +229,11 @@ export default function Overview() {
           <div className={"text-xl w-full flex flex-row items-center justify-between p-8"}>
             <div>
               <div className="text-gray-500 mb-1">入睡时间</div>
-              <div>{new Date(sleepData.sleepStart).toLocaleString()}</div>
+              <div>{new Date(sleepData.sleepStart).toLocaleString().slice(0, -3)}</div>
             </div>
             <div>
               <div className="text-gray-500 mb-1">醒来时间</div>
-              <div>{new Date(sleepData.sleepEnd).toLocaleString()}</div>
+              <div>{new Date(sleepData.sleepEnd).toLocaleString().slice(0, -3)}</div>
             </div>
             <Statistic
               title="睡眠质量"

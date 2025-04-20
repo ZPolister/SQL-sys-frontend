@@ -56,11 +56,11 @@ export default function SleepDialog({ visible, onClose, onSuccess }: SleepDialog
         <Form.FormItem label="入睡时间">
           <DatePicker
             enableTimePicker
-            format="YYYY-MM-DD HH:mm:ss"
+            format="YYYY-MM-DD HH:mm"
             value={formData.sleepStart}
             onChange={(val) => {
               if (val) {
-                const date = new Date(val);
+                const date = new Date(val as any);
                 setFormData({ ...formData, sleepStart: date });
               }
             }}
@@ -69,11 +69,11 @@ export default function SleepDialog({ visible, onClose, onSuccess }: SleepDialog
         <Form.FormItem label="醒来时间">
           <DatePicker
             enableTimePicker
-            format="YYYY-MM-DD HH:mm:ss"
+            format="YYYY-MM-DD HH:mm"
             value={formData.sleepEnd}
             onChange={(val) => {
               if (val) {
-                const date = new Date(val);
+                const date = new Date(val as any);
                 setFormData({ ...formData, sleepEnd: date });
               }
             }}

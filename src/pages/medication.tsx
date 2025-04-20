@@ -51,12 +51,9 @@ export default function Medication() {
   const fetchRecentReminders = async () => {
     const api = $app.$DefaultApi;
     try {
-      const result = await api.getMedicationReminder({
-        pageNum: 1,
-        pageSize: 4,
-      });
+      const result = await api.getMedicationReminderNext();
       if (result.code === 200) {
-        setRecentReminders(result.data?.records || []);
+        setRecentReminders(result.data || []);
       }
     } catch (error) {
       await MessagePlugin.error("获取最近服药提醒失败");
@@ -114,7 +111,7 @@ export default function Medication() {
             <Col key={reminder.reminderId} xs={24} sm={12} md={6}>
               <Card
                 bordered
-                theme="default"
+                theme="normal"
                 className="h-full"
                 title={reminder.medicationName}
                 actions={
@@ -226,7 +223,7 @@ export default function Medication() {
               title: "下次服药时间",
               colKey: "nextReminderTime",
               cell: ({ row }) => {
-                const date = new Date(row.nextReminderTime);
+                const date = new Date(row.nextReminderTime as any);
                 return date.toLocaleString("zh-CN", {
                   year: "numeric",
                   month: "2-digit",

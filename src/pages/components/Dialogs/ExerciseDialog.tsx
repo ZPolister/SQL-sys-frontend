@@ -65,7 +65,7 @@ export default function ExerciseDialog({ visible, onClose, onSuccess }: Exercise
           <InputNumber
             value={formData.durationMinutes}
             onChange={(val) =>
-              setFormData({ ...formData, durationMinutes: val })
+              setFormData({ ...formData, durationMinutes: val as any})
             }
           />
         </Form.FormItem>
@@ -73,14 +73,14 @@ export default function ExerciseDialog({ visible, onClose, onSuccess }: Exercise
           <InputNumber
             value={formData.caloriesBurned}
             onChange={(val) =>
-              setFormData({ ...formData, caloriesBurned: val })
+              setFormData({ ...formData, caloriesBurned: val as any})
             }
           />
         </Form.FormItem>
         <Form.FormItem label="运动开始时间">
           <DatePicker
             enableTimePicker
-            format="YYYY-MM-DD HH:mm:ss"
+            format="YYYY-MM-DD HH:mm"
             value={
               formData.startTimestamp
                 ? new Date(formData.startTimestamp)
@@ -88,7 +88,7 @@ export default function ExerciseDialog({ visible, onClose, onSuccess }: Exercise
             }
             onChange={(val) => {
               if (val) {
-                const date = new Date(val);
+                const date = new Date(val as any);
                 setFormData({ ...formData, startTimestamp: date.getTime() });
               }
             }}

@@ -99,7 +99,7 @@ export default function Sleep() {
 
   const fetchChartData = async () => {
     const api = $app.$DefaultApi;
-    const result = await api.getSleepDuration({ range: timeRange });
+    const result = await api.getSleepDuration({ range: timeRange as any });
     if (result.code === 200) setChartData(result.data);
   };
 
@@ -264,7 +264,7 @@ export default function Sleep() {
               colKey: "sleepStart",
               cell: ({ row }) => {
                 const date = row.sleepStart ? new Date(row.sleepStart) : null;
-                return date?.toLocaleString();
+                return date?.toLocaleString().slice(0, -3);
               },
             },
             {
@@ -275,7 +275,7 @@ export default function Sleep() {
               colKey: "sleepEnd",
               cell: ({ row }) => {
                 const date = row.sleepEnd ? new Date(row.sleepEnd) : null;
-                return date?.toLocaleString();
+                return date?.toLocaleString().slice(0, -3);
               },
             },
             {

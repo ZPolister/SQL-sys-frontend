@@ -105,7 +105,7 @@ export default function Sport() {
   const fetchChartData = async () => {
     const api = $app.$DefaultApi;
     const result = (await api.getExerciseDailyCaloriesBurned({
-      range: timeRange,
+      range: timeRange as any,
     })) as ResponseResult;
     if (result.code === 200) setChartData(result.data);
   };
@@ -307,7 +307,7 @@ export default function Sport() {
                 const date = row.startTimestamp
                   ? new Date(row.startTimestamp)
                   : null;
-                return date?.toLocaleString();
+                return date?.toLocaleString().slice(0, -3);
               },
             },
             {

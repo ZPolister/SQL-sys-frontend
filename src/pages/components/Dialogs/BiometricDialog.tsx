@@ -108,7 +108,7 @@ export default function BiometricDialog({ visible, onClose, onSuccess }: Biometr
         <Form.FormItem label="测量时间">
           <DatePicker
             enableTimePicker
-            format="YYYY-MM-DD HH:mm:ss"
+            format="YYYY-MM-DD HH:mm"
             value={
               formData.measurementTime
                 ? new Date(formData.measurementTime)
